@@ -1,3 +1,59 @@
+2012.02, Not yet released:
+
+	Fixes all over the tree and new features.
+
+	Toolchain: Default to GCC 4.5.x, add binutils 2.22. Java
+	support removed, Powerpc SPE ABI support.
+
+	Gentargets: scp and mercurial support.
+	Autotools: derrive host dependencies from target by default.
+
+	defconfigs: qemu configs for x86-64, mips and sparc.
+
+	uClibc: remove 0.9.30, backport unshare() support, add
+	0.9.32.1, use same config for ctng.
+
+	Bootloaders: U-Boot: add 2011.12, remove 2010.xx versions,
+	Barebox: add 2012.01, remove 2011.10.
+
+	Buildroot now calls the stop function of scripts in /etc/init.d at
+	shutdown.
+
+	Updated/fixed packages: atk, barebox, bash, beecrypt, binutils,
+	bison, bluez_utils, busybox, cairo, ccache, cdrkit, coreutils,
+	cramfs, dbus-glib, dialog, diffutils, dropbear, e2fsprogs,
+	ebtables, ed, ethtool, ffmpeg, file, flex, fluxbox,
+	fontconfig, gawk, grep, gst-dsp, gst-ffmpeg, hostapd, htop,
+	i2c-tools, icu, iproute2, ipset, iptables, iw, kismet, lame,
+	libcap, libcgi, libeXosip2, libffi, libgpg-error, libgtk2,
+	libidn, libmnl, libnl, libosip, libpng, libroxml, libv4l,
+	libxcb, libxml-parser-perl, libxslt, lighttpd, links, m4,
+	module-init-tools, mpc, mpd, mpfr, mtd-utils, nano, nbd,
+	ncurses, netsnmp, opencv, openssl, openvpn, orc, pcre,
+	pkg-config, proftpd, python, ruby, samba, squashfs3, sshfs,
+	sqlite, squid, syslinux, ti-utils, tiff, uboot, uboot-tools,
+	usbmount, valgrind, vsftpd, wpa_supplicant,
+	xapp_{bdftopcf,mkfontdir,mkfontscale,xkbcomp,xcursorgen,xman},
+	xdm, xenomai, xf86-video-sis, xfont_{encodings,font-util},
+	xlib_lib{fontenc,X11,Xau,Xcursor,Xdmcp,Xfixes,Xfont,Xrender},
+	xlib_libxkbfile, xutil_makedepend
+
+	New packages: connman, explorercanvas, feh, flot, giblib,
+	igh-ethercat, imlib2, jquery, jquery-sparklines,
+	jquery-validation, jsmin, kmod, libesmtp, libmbus,
+	NetworkManager, open2300, python-distutilscross, python-dpkt,
+	python-netifaces, python-pygame, python-setuptools, rt-tests,
+	sane-backends, transmission, unionfs, xf86-input-tslib,
+	xinput-calibrator
+
+	Issues resolved (http://bugs.uclibc.org):
+
+	#743:  Add Transmission bit torrent option to buildroot
+	#3403: libgpg-error: bump to version 1.10
+	#3409: libgpg-error: download from gnupg.org
+	#3421: nano: make tiny flag optional
+	#4700: setlocalversion not working for combination svn/ubuntu 11.10...
+
 2011.11, Released November 30th, 2011:
 
 	Fixes all over the tree.
