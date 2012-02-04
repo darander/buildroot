@@ -12,8 +12,21 @@ LIBEVAS_INSTALL_STAGING = YES
 LIBEVAS_DEPENDENCIES = host-pkg-config zlib libeina freetype
 
 HOST_LIBEVAS_DEPENDENCIES = host-pkg-config host-zlib host-libeina \
-				host-freetype host-libpng
-HOST_LIBEVAS_CONF_OPT += --enable-image-loader-png
+				host-freetype host-libpng host-jpeg
+HOST_LIBEVAS_CONF_OPT += \
+	--enable-image-loader-png \
+	--enable-image-loader-jpeg \
+	--disable-image-loader-gif \
+	--disable-image-loader-tiff \
+	--disable-image-loader-eet \
+	--disable-font-loader-eet \
+	--disable-cpu-sse3 \
+	--disable-software-sdl \
+	--disable-gl-sdl \
+	--disable-software-xlib \
+	--disable-gl-xlib \
+	--enable-software-xcb \
+	--disable-gl-xcb
 
 # rendering options
 ifeq ($(BR2_PACKAGE_LIBEVAS_SCALE_SAMPLE),y)
@@ -94,6 +107,9 @@ endif
 
 # code options
 ifeq ($(BR2_i386)$(BR2_x86_64),y)
+# defaults
+LIBEVAS_CONF_OPT += --disable-cpu-mmx --disable-cpu-sse --disable-cpu-sse3
+
 # enable if cpu variant has mmx support
 ifneq ($(BR2_x86_i386)$(BR2_x86_i486)$(BR2_x86_i586)$(BR2_x86_i686)$(BR2_x86_pentiumpro)$(BR2_x86_geode),y)
 LIBEVAS_CONF_OPT += --enable-cpu-mmx
@@ -103,14 +119,8 @@ LIBEVAS_CONF_OPT += --enable-cpu-sse
 
 ifneq ($(BR2_x86_pentium3)$(BR2_x86_pentium4)$(BR2_x86_prescott)$(BR2_x86_athlon_4)$(BR2_x86_opteron)$(BR2_x86_c32)$(BR2_x86_64_opteron),y)
 LIBEVAS_CONF_OPT += --enable-cpu-sse3
-else
-LIBEVAS_CONF_OPT += --disable-cpu-sse3
 endif # sse3
-else
-LIBEVAS_CONF_OPT += --disable-cpu-sse
 endif # sse
-else
-LIBEVAS_CONF_OPT += --disable-cpu-mmx
 endif # mmx
 endif # x86
 
