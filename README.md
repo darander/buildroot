@@ -31,7 +31,7 @@ To build everything, run:
 
 The build output is stored in the output/images directory. Subsequent
 builds are faster. It is possible to perform partial rebuilds. See the
-[http://http://buildroot.uclibc.org/](Buildroot) website for details.
+[Buildroot](http://buildroot.uclibc.org/) website for details.
 
 ## Creating a BeagleBone MicroSD card
 
