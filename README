@@ -1,51 +1,55 @@
-Buildroot for the BeagleBone - Erlang Version
-=============================================
+# Erlang-powered Buildroot repo for the BeagleBone 
 
 This README contains basic instructions for creating a system image
-for the BeagleBone using Buildroot. The image created is minimal, boots
-quickly, is fairly small, but doesn't do much. Packages can easily be
-added using Buildroot's "make menuconfig" configuration editor. 
+for the BeagleBone using Buildroot. The image is meant for creating
+embedded Erlang nodes.  Packages can easily be added using Buildroot's 
+`make menuconfig` configuration editor. 
 
-Preparing your system
----------------------
+## Preparing your system
 
 Buildroot requires several packages to be installed on the system 
 before it can work. On Ubuntu, the following apt-get line is sufficient:
 
-sudo apt-get install git-core bison flex g++ gettext texinfo libncurses5-dev
+    sudo apt-get install git-core bison flex g++ gettext texinfo libncurses5-dev
 
-Building
---------
+## Building
 
-First, tell buildroot which configuration to use:
+To build a disk image, run:
 
-make beaglebone_erlang_defconfig
+    ./build_disk_image.sh
+
+This will result in a .img file being built. This takes a while.
+
+If you are hacking the main image, you probably want more granularity in
+building everything. First tell Buildroot which configuration to use:
+
+    make beaglebone_erlang_defconfig
 
 To build everything, run:
 
-make
+    make
 
-The initial build takes a while since many packages need to be downloaded and 
-built. The downloads are cached in the dl directory. Subsequent builds are
-faster.
+The build output is stored in the output/images directory. Subsequent
+builds are faster. It is possible to perform partial rebuilds. See the
+[http://http://buildroot.uclibc.org/](Buildroot) website for details.
 
-The build output is stored in the output/images directory.
+## Creating a BeagleBone MicroSD card
 
-Creating a BeagleBone MicroSD card
-----------------------------------
+After the build completes successfully, you should have a .img file.
+This is a binary image that should be written to the beginning of the
+MicroSD card. To do this, insert a MicroSD card. You will need to
+unmount any partitions that were auto-mounted before writing the .img
+file. The commands should be something similar to the following:
 
-After the build completes successfully, run the create_sdcard.sh script to
-format a MicroSD card for the BeagleBone. While it certainly doesn't need
-to be this large, I currently use 4 GB MicroSD cards and the script
-makes that assumption. Large cards should work fine.
+    find /dev -name "sdX?" -exec umount "{}" ";"
+    sudo dd if=xxxxxxx.img of=/dev/sdX bs=128k
 
-Since the create_sdcard.sh script formats the card, be very careful with
-it to avoid losing data. It fails if you specify a disk that is currently
-mounted.
+Replace sdX with the device for the MicroSD card. This can be found by
+looking at the end of `dmesg` after plugging in the MicroSD card. Be
+careful with this since a typo in the device file can make the system
+unbootable.
 
-
-Updating the Root FS on the BeagleBone
---------------------------------------
+## Updating the Root FS on the BeagleBone
 
 The Root FS is configured to mount read-only on the BeagleBone. This is done 
 to prevent data corruption from unsafe shutdowns and as a reminder that all
@@ -53,7 +57,7 @@ configuration and new packages have to end up in the buildroot configuration.
 
 Since this can be annoying during debug, the rootfs can be mounted by running:
 
-mount -o remount,rw /
+    mount -o remount,rw /
 
  
  
