@@ -11,7 +11,7 @@ fi
 make beaglebone_erlang_defconfig
 make
 
-OUTPUTFILE=bbone-erlang-`git describe`.img.gz
+OUTPUTFILE=bbone-erlang-`git describe`.img
 
 MBRFILE=/tmp/mbr.bin
 VFATFILE=/tmp/vfat.bin
