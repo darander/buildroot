@@ -17,16 +17,36 @@ HOST_LIBECORE_CONF_OPT += --enable-ecore-evas
 # default options
 LIBECORE_CONF_OPT = --disable-simple-x11
 
+ifeq ($(BR2_PACKAGE_TSLIB),y)
+LIBECORE_DEPENDENCIES += tslib
+endif
+
+ifeq ($(BR2_PACKAGE_LIBGLIB2),y)
+LIBECORE_DEPENDENCIES += libglib2
+endif
+
+ifeq ($(BR2_PACKAGE_OPENSSL),y)
+LIBECORE_DEPENDENCIES += openssl
+endif
+
+ifeq ($(BR2_PACKAGE_GNUTLS),y)
+LIBECORE_DEPENDENCIES += gnutls
+endif
+
+ifeq ($(BR2_PACKAGE_LIBCURL),y)
+LIBECORE_DEPENDENCIES += libcurl
+endif
+
 # libecore
 ifeq ($(BR2_PACKAGE_LIBECORE_DIRECTFB),y)
 LIBECORE_CONF_OPT += --enable-ecore-directfb
+LIBECORE_DEPENDENCIES += directfb
 else
 LIBECORE_CONF_OPT += --disable-ecore-directfb
 endif
 
 ifeq ($(BR2_PACKAGE_LIBECORE_FB),y)
 LIBECORE_CONF_OPT += --enable-ecore-fb
-LIBECORE_DEPENDENCIES += directfb
 else
 LIBECORE_CONF_OPT += --disable-ecore-fb
 endif
@@ -42,7 +62,7 @@ ifeq ($(BR2_PACKAGE_LIBECORE_X),y)
 LIBECORE_CONF_OPT += --enable-ecore-x
 LIBECORE_DEPENDENCIES += xlib_libXext xlib_libX11
 else
-LIBECORE_CONF_OPT += --disable-ecore-x
+LIBECORE_CONF_OPT += --disable-ecore-x --disable-ecore-imf-xim
 endif
 
 ifeq ($(BR2_PACKAGE_LIBECORE_X_XCB),y)
