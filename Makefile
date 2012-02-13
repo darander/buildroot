@@ -26,6 +26,12 @@
 # Set and export the version string
 export BR2_VERSION:=2012.02-git
 
+# Check for minimal make version (note: this check will break at make 10.x)
+MIN_MAKE_VERSION=3.81
+ifneq ($(firstword $(sort $(MAKE_VERSION) $(MIN_MAKE_VERSION))),$(MIN_MAKE_VERSION))
+$(error You have make '$(MAKE_VERSION)' installed. GNU make >= $(MIN_MAKE_VERSION) is required)
+endif
+
 # This top-level Makefile can *not* be executed in parallel
 .NOTPARALLEL:
 
@@ -297,6 +303,8 @@ include package/Makefile.in
 
 all: world
 
+include support/dependencies/dependencies.mk
+
 # We also need the various per-package makefiles, which also add
 # each selected package to TARGETS if that package was selected
 # in the .config file.
@@ -367,7 +375,7 @@ $(BUILD_DIR)/buildroot-config/auto.conf: $(CONFIG_DIR)/.config
 
 prepare: $(BUILD_DIR)/buildroot-config/auto.conf
 
-world: prepare dependencies dirs $(BASE_TARGETS) $(TARGETS_ALL)
+world: prepare dirs dependencies $(BASE_TARGETS) $(TARGETS_ALL)
 
 $(O)/toolchainfile.cmake:
 	@echo -en "\
@@ -695,8 +703,15 @@ endif
 
 release: OUT=buildroot-$(BR2_VERSION)
 
+# Create release tarballs. We need to fiddle a bit to add the generated
+# documentation to the git output
 release:
-	git archive --format=tar --prefix=$(OUT)/ master|gzip -9 >$(OUT).tar.gz
+	git archive --format=tar --prefix=$(OUT)/ master > $(OUT).tar
+	$(MAKE) O=$(OUT) manual-html manual-txt manual-pdf
+	tar rf $(OUT).tar $(OUT)
+	gzip -9 -c < $(OUT).tar > $(OUT).tar.gz
+	bzip2 -9 -c < $(OUT).tar > $(OUT).tar.bz2
+	rm -rf $(OUT) $(OUT).tar
 
 ################################################################################
 # GENDOC -- generates the make targets needed to build a specific type of
@@ -719,7 +734,7 @@ $(1)-$(3): $$(O)/docs/$(1)/$(1).$(4)
 
 $$(O)/docs/$(1)/$(1).$(4): docs/$(1)/$(1).txt $$($(call UPPERCASE,$(1))_SOURCES)
 	@echo "Generating $(5) $(1)..."
-	$(Q)mkdir -p $$(O)/docs/$(1)/$(2)
+	$(Q)mkdir -p $$(@D)
 	$(Q)a2x $(6) -f $(2) -d book -L -r $(TOPDIR)/docs/images \
 	  -D $$(@D) $$<
 endef
