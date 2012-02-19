@@ -8,10 +8,10 @@ ERLANG_VERSION = R15B
 ERLANG_SITE = http://erlang.org/download
 ERLANG_SOURCE = otp_src_$(ERLANG_VERSION).tar.gz
 ERLANG_DEPENDENCIES = ncurses
-HOST_ERLANG_CONF_OPT = --disable-hipe \
-                --disable-dynamic-ssl-lib --without-termcap --without-javac \
-                --without-ssl
 
+#
+# Host and target common definitions
+#
 define ERLANG_SAVE_ORIG_FILE
         # After patches are applied, this file gets removed because of
         # its .orig extension. Save a copy so that we can brint it back.
@@ -27,9 +27,16 @@ HOST_ERLANG_POST_PATCH_HOOKS += ERLANG_RESTORE_ORIG_FILE
 ERLANG_POST_EXTRACT_HOOKS += ERLANG_SAVE_ORIG_FILE
 ERLANG_POST_PATCH_HOOKS += ERLANG_RESTORE_ORIG_FILE
 
-ERLANG_XCOMP_CONF = $(ERLANG_DIR)/xcomp/erl-xcomp-buildroot.conf
-
-ERLANG_CONFIGURE_FLAGS = --prefix=/usr \
+#
+# Host definitions (autotools)
+#
+# This is a minimal install since the Erlang build and compiler tools
+# are all that's needed.
+#
+HOST_ERLANG_CONF_OPT = --disable-hipe \
+                --disable-dynamic-ssl-lib --without-termcap --without-javac \
+                --without-ssl
+HOST_ERLANG_CONFIGURE_FLAGS = --prefix=/usr \
                 --exec-prefix=/usr \
                 --sysconfdir=/etc \
                 --program-prefix="" \
@@ -40,12 +47,33 @@ ERLANG_CONFIGURE_FLAGS = --prefix=/usr \
                 $(SHARED_STATIC_LIBS_OPTS) \
                 $(QUIET) 
 
-ERLANG_CONFIGURE_FLAGS += --disable-hipe --disable-threads --disable-smp \
+HOST_ERLANG_CONFIGURE_FLAGS += --disable-hipe --disable-threads --disable-smp \
 		--disable-megaco-flex-scanner-lineno \
 		--disable-megaco-reentrant-flex-scanner \
 		--disable-dynamic-ssl-lib --without-termcap --without-javac \
 		--without-ssl
 
+#
+# Target definitions
+#
+ERLANG_DONT_SKIP_APP = stdlib erts kernel compiler
+ifeq ($(BR2_PACKAGE_ERLANG_COMMON_TEST),y)
+ERLANG_DONT_SKIP_APP += common_test 
+endif
+ifeq ($(BR2_PACKAGE_ERLANG_RUNTIME_TOOLS),y)
+ERLANG_DONT_SKIP_APP += runtime_tools 
+endif
+ifeq ($(BR2_PACKAGE_ERLANG_SASL),y)
+ERLANG_DONT_SKIP_APP += sasl 
+endif
+ifeq ($(BR2_PACKAGE_ERLANG_TEST_SERVER),y)
+ERLANG_DONT_SKIP_APP += test_server 
+endif
+ifeq ($(BR2_PACKAGE_ERLANG_TOOLS),y)
+ERLANG_DONT_SKIP_APP += tools 
+endif
+
+ERLANG_XCOMP_CONF = $(ERLANG_DIR)/xcomp/erl-xcomp-buildroot.conf
 TARGET_CROSS_NAME = $(shell basename $(TARGET_CROSS) | sed "s/\-$$//")
 define ERLANG_CONFIGURE_CMDS
 	echo "erl_xcomp_build=guess" > $(ERLANG_XCOMP_CONF)
@@ -60,6 +88,12 @@ define ERLANG_CONFIGURE_CMDS
 	echo "AR=$(TARGET_AR)" >> $(ERLANG_XCOMP_CONF)
 	echo "erl_xcomp_sysroot=$(STAGING_DIR)" >> $(ERLANG_XCOMP_CONF)
 	cd $(@D) && ./otp_build configure --xcomp-conf=$(ERLANG_XCOMP_CONF)
+	for i in $(@D)/lib/*; do \
+		[ -d $$i ] && touch $$i/SKIP; \
+	done
+	for i in $(ERLANG_DONT_SKIP_APP); do \
+		rm $(@D)/lib/$$i/SKIP; \
+	done
 endef
 
 define ERLANG_BUILD_CMDS
@@ -67,10 +101,21 @@ define ERLANG_BUILD_CMDS
 	cd $(@D) && ./otp_build release
 endef
 
+ERLANG_RELEASE_DIR=$(@D)/release/*
+define ERLANG_REMOVE_UNNEEDED_FILES
+	for i in $(ERLANG_RELEASE_DIR)/erts* $(ERLANG_RELEASE_DIR)/lib/*; do \
+		rm -rf $$i/src $$i/include $$i/doc $$i/man $$i/examples $$i/emacs; \
+	done
+	rm -rf $(ERLANG_RELEASE_DIR)/usr/include
+	rm -rf $(ERLANG_RELEASE_DIR)/misc
+	rm -f $(ERLANG_RELEASE_DIR)/Install
+endef
+
 define ERLANG_INSTALL_TARGET_CMDS
-	-rm $(@D)/release/*/bin/runtest
-	cd $(@D)/release/* && ./Install -cross -minimal /usr
-	cp -a $(@D)/release/*/* $(TARGET_DIR)/usr
+	-rm $(ERLANG_RELEASE_DIR)/bin/runtest
+	cd $(ERLANG_RELEASE_DIR) && ./Install -cross -minimal /usr
+	$(ERLANG_REMOVE_UNNEEDED_FILES)
+	cp -a $(ERLANG_RELEASE_DIR)/* $(TARGET_DIR)/usr
 endef
 
 $(eval $(call GENTARGETS))

@@ -6,3 +6,33 @@ config BR2_PACKAGE_ERLANG
 	  concurrency, fault-tolerance, and soft real-time.
 
 	  http://www.erlang.org/
+
+if BR2_PACKAGE_ERLANG
+
+config BR2_PACKAGE_ERLANG_COMMON_TEST
+        bool "common_test application"
+        help
+          common_test application for Erlang
+
+config BR2_PACKAGE_ERLANG_RUNTIME_TOOLS
+        bool "runtime_tools application"
+        help
+          runtime_tools application for Erlang
+
+config BR2_PACKAGE_ERLANG_SASL
+        bool "sasl application"
+        help
+          sasl application for Erlang
+
+config BR2_PACKAGE_ERLANG_TEST_SERVER
+        bool "test_server application"
+        help
+          test_server application for Erlang
+
+config BR2_PACKAGE_ERLANG_TOOLS
+        bool "tools application"
+        help
+          tools application for Erlang
+
+endif
+
