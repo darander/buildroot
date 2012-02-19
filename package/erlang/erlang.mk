@@ -34,8 +34,7 @@ ERLANG_POST_PATCH_HOOKS += ERLANG_RESTORE_ORIG_FILE
 # are all that's needed.
 #
 HOST_ERLANG_CONF_OPT = --disable-hipe \
-                --disable-dynamic-ssl-lib --without-termcap --without-javac \
-                --without-ssl
+                --without-termcap --without-javac
 HOST_ERLANG_CONFIGURE_FLAGS = --prefix=/usr \
                 --exec-prefix=/usr \
                 --sysconfdir=/etc \
@@ -50,8 +49,7 @@ HOST_ERLANG_CONFIGURE_FLAGS = --prefix=/usr \
 HOST_ERLANG_CONFIGURE_FLAGS += --disable-hipe --disable-threads --disable-smp \
 		--disable-megaco-flex-scanner-lineno \
 		--disable-megaco-reentrant-flex-scanner \
-		--disable-dynamic-ssl-lib --without-termcap --without-javac \
-		--without-ssl
+		--without-termcap --without-javac
 
 #
 # Target definitions
