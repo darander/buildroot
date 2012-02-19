@@ -1,0 +1,8 @@
+config BR2_PACKAGE_ERLANG_REBAR
+	bool "erlang-rebar"
+	depends on BR2_PACKAGE_ERLANG
+	help
+	  erlang-rebar is a sophisticated build-tool for Erlang projects that follows OTP principles.
+
+	  http://gihub.com/basho/rebar
+
