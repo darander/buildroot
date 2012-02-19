@@ -12,7 +12,7 @@ ERLANG_REBAR_DEPENDENCIES = erlang host-erlang
 HOST_ERLANG_REBAR_DEPENDENCIES = host-erlang
 
 define ERLANG_REBAR_BUILD_CMDS
-	(cd $(@D); $(HOST_DIR)/usr/bin/escript ./bootstrap)
+	(cd $(@D); $(HOST_MAKE_ENV) ./bootstrap)
 endef
 
 define ERLANG_REBAR_INSTALL_TARGET_CMDS
@@ -20,11 +20,11 @@ define ERLANG_REBAR_INSTALL_TARGET_CMDS
 endef
 
 define HOST_ERLANG_REBAR_BUILD_CMDS
-	(cd $(@D); ./bootstrap)
+	(cd $(@D); $(HOST_MAKE_ENV) ./bootstrap)
 endef
 
-define HOST_ERLANG_REBAR_INSTALL_TARGET_CMDS
-	(cd $(@D); $(HOST_DIR)/usr/bin/escript ./bootstrap)
+define HOST_ERLANG_REBAR_INSTALL_CMDS
+	cp $(@D)/rebar $(HOST_DIR)/usr/bin
 endef
 
 $(eval $(call GENTARGETS))
