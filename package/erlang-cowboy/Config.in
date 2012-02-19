@@ -1,0 +1,8 @@
+config BR2_PACKAGE_ERLANG_COWBOY
+	bool "erlang-cowboy"
+	depends on BR2_PACKAGE_ERLANG
+	help
+	  erlang-cowboy is a small, fast, modular HTTP server and socket acceptor pool.
+
+	  http://gihub.com/extend/cowboy
+
