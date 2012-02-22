@@ -1,0 +1,8 @@
+config BR2_PACKAGE_ERLANG_MOCHIWEB
+	bool "erlang-mochiweb"
+	depends on BR2_PACKAGE_ERLANG
+	help
+	  MochiWeb is an Erlang library for building lightweight HTTP servers.
+
+	  http://gihub.com/mochi/mochiweb
+

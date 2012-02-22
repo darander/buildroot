@@ -231,8 +231,9 @@ menu "Interpreter languages and scripting"
 source "package/erlang/Config.in"
 if BR2_PACKAGE_ERLANG
 menu "Other libraries/applications"
-source "package/erlang-rebar/Config.in"
 source "package/erlang-cowboy/Config.in"
+source "package/erlang-mochiweb/Config.in"
+source "package/erlang-rebar/Config.in"
 endmenu
 endif
 source "package/haserl/Config.in"
