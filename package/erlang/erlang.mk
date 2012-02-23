@@ -28,17 +28,14 @@ ERLANG_POST_EXTRACT_HOOKS += ERLANG_SAVE_ORIG_FILE
 ERLANG_POST_PATCH_HOOKS += ERLANG_RESTORE_ORIG_FILE
 
 #
-# Host definitions (autotools)
+# Target definitions
 #
-# This is a minimal install since the Erlang build and compiler tools
-# are all that's needed.
-#
-HOST_ERLANG_CONF_OPT = --disable-hipe \
+ERLANG_CONF_OPT = --disable-hipe \
                 --without-termcap --without-javac
-HOST_ERLANG_CONFIGURE_FLAGS = --prefix=/usr \
+ERLANG_CONFIGURE_FLAGS = --prefix=/usr \
                 --exec-prefix=/usr \
                 --sysconfdir=/etc \
-                --program-prefix="" \
+                --program-prefix='' \
                 $(DISABLE_DOCUMENTATION) \
                 $(DISABLE_NLS) \
                 $(DISABLE_LARGEFILE) \
@@ -46,7 +43,7 @@ HOST_ERLANG_CONFIGURE_FLAGS = --prefix=/usr \
                 $(SHARED_STATIC_LIBS_OPTS) \
                 $(QUIET) 
 
-HOST_ERLANG_CONFIGURE_FLAGS += --disable-hipe --disable-threads --disable-smp \
+ERLANG_CONFIGURE_FLAGS += --disable-hipe --disable-threads --disable-smp \
 		--disable-megaco-flex-scanner-lineno \
 		--disable-megaco-reentrant-flex-scanner \
 		--without-termcap --without-javac
@@ -54,7 +51,7 @@ HOST_ERLANG_CONFIGURE_FLAGS += --disable-hipe --disable-threads --disable-smp \
 #
 # Target definitions
 #
-ERLANG_DONT_SKIP_APP = stdlib erts kernel compiler
+ERLANG_DONT_SKIP_APP = stdlib kernel compiler 
 ifeq ($(BR2_PACKAGE_ERLANG_COMMON_TEST),y)
 ERLANG_DONT_SKIP_APP += common_test 
 endif
@@ -76,9 +73,9 @@ TARGET_CROSS_NAME = $(shell basename $(TARGET_CROSS) | sed "s/\-$$//")
 define ERLANG_CONFIGURE_CMDS
 	echo "erl_xcomp_build=guess" > $(ERLANG_XCOMP_CONF)
 	echo "erl_xcomp_host=$(TARGET_CROSS_NAME)" >> $(ERLANG_XCOMP_CONF)
-	echo "erl_xcomp_configure_flags=$(ERLANG_CONFIGURE_FLAGS)" >> $(ERLANG_XCOMP_CONF)
+	echo "erl_xcomp_configure_flags=\"$(ERLANG_CONFIGURE_FLAGS)\"" >> $(ERLANG_XCOMP_CONF)
 	echo "CC=$(TARGET_CC)" >> $(ERLANG_XCOMP_CONF)
-	echo "CFLAGS=$(TARGET_CFLAGS)" >> $(ERLANG_XCOMP_CONF)
+	echo "CFLAGS=\"$(TARGET_CFLAGS)\"" >> $(ERLANG_XCOMP_CONF)
 	echo "CPP=$(TARGET_CPP)" >> $(ERLANG_XCOMP_CONF)
 	echo "CXX=$(TARGET_CXX)" >> $(ERLANG_XCOMP_CONF)
 	echo "LD=$(TARGET_LD)" >> $(ERLANG_XCOMP_CONF)
