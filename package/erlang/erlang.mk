@@ -30,7 +30,6 @@ ERLANG_POST_PATCH_HOOKS += ERLANG_RESTORE_ORIG_FILE
 #
 # Target definitions
 #
-ERLANG_CONF_OPT = --without-termcap --without-javac
 ERLANG_CONFIGURE_FLAGS = --prefix=/usr \
                 --exec-prefix=/usr \
                 --sysconfdir=/etc \
@@ -45,7 +44,7 @@ ERLANG_CONFIGURE_FLAGS = --prefix=/usr \
 ERLANG_CONFIGURE_FLAGS += --disable-threads --disable-smp \
 		--disable-megaco-flex-scanner-lineno \
 		--disable-megaco-reentrant-flex-scanner \
-		--without-termcap --without-javac
+		--without-javac
 
 #
 # Target definitions
@@ -55,7 +54,6 @@ ERLANG_DONT_SKIP_APP = stdlib kernel compiler
 ifeq ($(BR2_PACKAGE_ERLANG_HIPE),y)
 ERLANG_DONT_SKIP_APP += hipe 
 ERLANG_CONFIGURE_FLAGS += --enable-hipe 
-ERLANG_CONF_OPT += --enable-hipe
 endif
 
 ifeq ($(BR2_PACKAGE_ERLANG_COMMON_TEST),y)
