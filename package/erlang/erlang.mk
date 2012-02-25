@@ -30,8 +30,7 @@ ERLANG_POST_PATCH_HOOKS += ERLANG_RESTORE_ORIG_FILE
 #
 # Target definitions
 #
-ERLANG_CONF_OPT = --disable-hipe \
-                --without-termcap --without-javac
+ERLANG_CONF_OPT = --without-termcap --without-javac
 ERLANG_CONFIGURE_FLAGS = --prefix=/usr \
                 --exec-prefix=/usr \
                 --sysconfdir=/etc \
@@ -43,7 +42,7 @@ ERLANG_CONFIGURE_FLAGS = --prefix=/usr \
                 $(SHARED_STATIC_LIBS_OPTS) \
                 $(QUIET) 
 
-ERLANG_CONFIGURE_FLAGS += --disable-hipe --disable-threads --disable-smp \
+ERLANG_CONFIGURE_FLAGS += --disable-threads --disable-smp \
 		--disable-megaco-flex-scanner-lineno \
 		--disable-megaco-reentrant-flex-scanner \
 		--without-termcap --without-javac
@@ -52,6 +51,13 @@ ERLANG_CONFIGURE_FLAGS += --disable-hipe --disable-threads --disable-smp \
 # Target definitions
 #
 ERLANG_DONT_SKIP_APP = stdlib kernel compiler 
+
+ifeq ($(BR2_PACKAGE_ERLANG_HIPE),y)
+ERLANG_DONT_SKIP_APP += hipe 
+ERLANG_CONFIGURE_FLAGS += --enable-hipe 
+ERLANG_CONF_OPT += --enable-hipe
+endif
+
 ifeq ($(BR2_PACKAGE_ERLANG_COMMON_TEST),y)
 ERLANG_DONT_SKIP_APP += common_test 
 endif
@@ -81,8 +87,9 @@ define ERLANG_CONFIGURE_CMDS
 	echo "LD=$(TARGET_LD)" >> $(ERLANG_XCOMP_CONF)
 	echo "RANLIB=$(TARGET_RANLIB)" >> $(ERLANG_XCOMP_CONF)
 	echo "AR=$(TARGET_AR)" >> $(ERLANG_XCOMP_CONF)
+	echo "QEMU=\"qemu-arm -L $(TARGET_DIR)\"" >> $(ERLANG_XCOMP_CONF)
 	echo "erl_xcomp_sysroot=$(STAGING_DIR)" >> $(ERLANG_XCOMP_CONF)
-	cd $(@D) && ./otp_build configure --xcomp-conf=$(ERLANG_XCOMP_CONF)
+	cd $(@D) && $(HOST_MAKE_ENV) ./otp_build configure --xcomp-conf=$(ERLANG_XCOMP_CONF)
 	for i in $(@D)/lib/*; do \
 		[ -d $$i ] && touch $$i/SKIP; \
 	done
@@ -92,8 +99,8 @@ define ERLANG_CONFIGURE_CMDS
 endef
 
 define ERLANG_BUILD_CMDS
-	cd $(@D) && ./otp_build boot
-	cd $(@D) && ./otp_build release
+	cd $(@D) && $(HOST_MAKE_ENV) ./otp_build boot
+	cd $(@D) && $(HOST_MAKE_ENV) ./otp_build release
 endef
 
 ERLANG_RELEASE_DIR=$(@D)/release/*
@@ -108,7 +115,7 @@ endef
 
 define ERLANG_INSTALL_TARGET_CMDS
 	-rm $(ERLANG_RELEASE_DIR)/bin/runtest
-	cd $(ERLANG_RELEASE_DIR) && ./Install -cross -minimal /usr
+	cd $(ERLANG_RELEASE_DIR) && $(HOST_MAKE_ENV) ./Install -cross -minimal /usr
 	$(ERLANG_REMOVE_UNNEEDED_FILES)
 	cp -a $(ERLANG_RELEASE_DIR)/* $(TARGET_DIR)/usr
 endef

@@ -9,6 +9,13 @@ config BR2_PACKAGE_ERLANG
 
 if BR2_PACKAGE_ERLANG
 
+config BR2_PACKAGE_ERLANG_HIPE
+        bool "HiPE - Experimental!"
+        help
+	  Enable HiPE support in Erlang. This is a highly experimental
+	  feature right now.
+
+menu "Core applications"
 config BR2_PACKAGE_ERLANG_COMMON_TEST
         bool "common_test application"
         help
@@ -33,6 +40,7 @@ config BR2_PACKAGE_ERLANG_TOOLS
         bool "tools application"
         help
           tools application for Erlang
+endmenu
 
 endif
 

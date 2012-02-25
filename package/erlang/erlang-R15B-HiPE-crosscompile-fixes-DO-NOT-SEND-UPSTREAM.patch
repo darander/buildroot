@@ -1,0 +1,92 @@
+From 57f3e3cafc3a95c693aabfc3674266aa7ce5c1c1 Mon Sep 17 00:00:00 2001
+From: Frank Hunleth <fhunleth@troodon-software.com>
+Date: Thu, 23 Feb 2012 19:18:23 -0800
+Subject: [PATCH] Fixes to get HiPE to crosscompile. DO NOT SEND UPSTREAM YET!!
+
+Signed-off-by: Frank Hunleth <fhunleth@troodon-software.com>
+---
+ erts/configure            |    5 +++--
+ erts/configure.in         |    5 +++--
+ erts/emulator/Makefile.in |    2 +-
+ lib/hipe/rtl/Makefile     |    2 +-
+ 4 files changed, 8 insertions(+), 6 deletions(-)
+
+diff --git a/erts/configure b/erts/configure
+index 7a7c683..d5fec23 100755
+--- a/erts/configure
++++ b/erts/configure
+@@ -5239,10 +5239,10 @@ fi
+ case $chk_opsys_ in
+     win32)			OPSYS=win32;;
+     solaris2.*|SunOS5.*)	OPSYS=sol2;;
+-    linux|Linux)		OPSYS=linux;;
++    linux*|Linux)		OPSYS=linux;;
+     darwin|Darwin)		OPSYS=darwin;;
+     freebsd|FreeBSD)		OPSYS=freebsd;;
+-    *)				OPSYS=noopsys
++    *)				OPSYS=noopsys;;
+ esac
+ 
+ if test "x$host_alias" != "x" -a "x$host_cpu" != "x"; then
+@@ -5266,6 +5266,7 @@ case $chk_arch_ in
+     ppc)	ARCH=ppc;;
+     ppc64)	ARCH=ppc64;;
+     "Power Macintosh")	ARCH=ppc;;
++    arm)	ARCH=arm;;
+     armv5b)	ARCH=arm;;
+     armv5teb)	ARCH=arm;;
+     armv5tel)	ARCH=arm;;
+diff --git a/erts/configure.in b/erts/configure.in
+index 50f8908..5bfc77b 100644
+--- a/erts/configure.in
++++ b/erts/configure.in
+@@ -541,10 +541,10 @@ fi
+ case $chk_opsys_ in
+     win32)			OPSYS=win32;;
+     solaris2.*|SunOS5.*)	OPSYS=sol2;;
+-    linux|Linux)		OPSYS=linux;;
++    linux*|Linux)		OPSYS=linux;;
+     darwin|Darwin)		OPSYS=darwin;;
+     freebsd|FreeBSD)		OPSYS=freebsd;;
+-    *)				OPSYS=noopsys
++    *)				OPSYS=noopsys;;
+ esac
+ 
+ if test "x$host_alias" != "x" -a "x$host_cpu" != "x"; then
+@@ -568,6 +568,7 @@ case $chk_arch_ in
+     ppc)	ARCH=ppc;;
+     ppc64)	ARCH=ppc64;;
+     "Power Macintosh")	ARCH=ppc;;
++    arm)	ARCH=arm;;
+     armv5b)	ARCH=arm;;
+     armv5teb)	ARCH=arm;;
+     armv5tel)	ARCH=arm;;
+diff --git a/erts/emulator/Makefile.in b/erts/emulator/Makefile.in
+index a5d8217..acc3392 100644
+--- a/erts/emulator/Makefile.in
++++ b/erts/emulator/Makefile.in
+@@ -860,7 +860,7 @@ $(BINDIR)/hipe_mkliterals$(TF_MARKER):	$(OBJDIR)/hipe_mkliterals.o
+ $(OBJDIR)/hipe_mkliterals.o:	$(TTF_DIR)/hipe_x86_asm.h $(TTF_DIR)/hipe_ppc_asm.h $(TTF_DIR)/beam_opcodes.h
+ 
+ $(TTF_DIR)/hipe_literals.h:	$(BINDIR)/hipe_mkliterals$(TF_MARKER)
+-	$(BINDIR)/hipe_mkliterals$(TF_MARKER) -c > $@
++	qemu-arm -L /home/fhunleth/bbone-erlang-buildroot/output/target $(BINDIR)/hipe_mkliterals$(TF_MARKER) -c > $@
+ 
+ $(OBJDIR)/hipe_x86_glue.o:	hipe/hipe_x86_glue.S $(TTF_DIR)/hipe_x86_asm.h $(TTF_DIR)/hipe_literals.h hipe/hipe_mode_switch.h
+ $(TTF_DIR)/hipe_x86_bifs.S:	hipe/hipe_x86_bifs.m4 hipe/hipe_x86_asm.m4 hipe/hipe_bif_list.m4 $(TARGET)/erl_bif_list.h hipe/hipe_gbif_list.h
+diff --git a/lib/hipe/rtl/Makefile b/lib/hipe/rtl/Makefile
+index 690045b..116dec2 100644
+--- a/lib/hipe/rtl/Makefile
++++ b/lib/hipe/rtl/Makefile
+@@ -127,7 +127,7 @@ MKLIT_FLAGS=
+ endif
+ 
+ 
+-HIPE_MKLITERALS=$(ERL_TOP)/bin/$(TARGET)/hipe_mkliterals$(TYPE_STR)$(FLAVOR_STR)
++HIPE_MKLITERALS=qemu-arm -L /home/fhunleth/bbone-erlang-buildroot/output/target $(ERL_TOP)/bin/$(TARGET)/hipe_mkliterals$(TYPE_STR)$(FLAVOR_STR)
+ 
+ 
+ hipe_literals.hrl: $(HIPE_MKLITERALS)
+-- 
+1.7.4.1
+
