@@ -1,4 +1,4 @@
-From 57f3e3cafc3a95c693aabfc3674266aa7ce5c1c1 Mon Sep 17 00:00:00 2001
+From daeadf3036ef8dc1b66560f3f790ef79a70ab6f9 Mon Sep 17 00:00:00 2001
 From: Frank Hunleth <fhunleth@troodon-software.com>
 Date: Thu, 23 Feb 2012 19:18:23 -0800
 Subject: [PATCH] Fixes to get HiPE to crosscompile. DO NOT SEND UPSTREAM YET!!
@@ -75,18 +75,18 @@ index a5d8217..acc3392 100644
  $(OBJDIR)/hipe_x86_glue.o:	hipe/hipe_x86_glue.S $(TTF_DIR)/hipe_x86_asm.h $(TTF_DIR)/hipe_literals.h hipe/hipe_mode_switch.h
  $(TTF_DIR)/hipe_x86_bifs.S:	hipe/hipe_x86_bifs.m4 hipe/hipe_x86_asm.m4 hipe/hipe_bif_list.m4 $(TARGET)/erl_bif_list.h hipe/hipe_gbif_list.h
 diff --git a/lib/hipe/rtl/Makefile b/lib/hipe/rtl/Makefile
-index 690045b..116dec2 100644
+index 690045b..a0f030e 100644
 --- a/lib/hipe/rtl/Makefile
 +++ b/lib/hipe/rtl/Makefile
-@@ -127,7 +127,7 @@ MKLIT_FLAGS=
- endif
- 
- 
--HIPE_MKLITERALS=$(ERL_TOP)/bin/$(TARGET)/hipe_mkliterals$(TYPE_STR)$(FLAVOR_STR)
-+HIPE_MKLITERALS=qemu-arm -L /home/fhunleth/bbone-erlang-buildroot/output/target $(ERL_TOP)/bin/$(TARGET)/hipe_mkliterals$(TYPE_STR)$(FLAVOR_STR)
+@@ -131,7 +131,7 @@ HIPE_MKLITERALS=$(ERL_TOP)/bin/$(TARGET)/hipe_mkliterals$(TYPE_STR)$(FLAVOR_STR)
  
  
  hipe_literals.hrl: $(HIPE_MKLITERALS)
+-	$(HIPE_MKLITERALS) $(MKLIT_FLAGS) -e > hipe_literals.hrl
++	qemu-arm -L /home/fhunleth/bbone-erlang-buildroot/output/target $(HIPE_MKLITERALS) $(MKLIT_FLAGS) -e > hipe_literals.hrl
+ 
+ # Need to generate hipe.hrl from one and only one target in one and only
+ # one makefile; otherwise, clearmake will force rebuilds of hipe over and
 -- 
 1.7.4.1
 

@@ -88,17 +88,25 @@ define ERLANG_CONFIGURE_CMDS
 	echo "QEMU=\"qemu-arm -L $(TARGET_DIR)\"" >> $(ERLANG_XCOMP_CONF)
 	echo "erl_xcomp_sysroot=$(STAGING_DIR)" >> $(ERLANG_XCOMP_CONF)
 	cd $(@D) && $(HOST_MAKE_ENV) ./otp_build configure --xcomp-conf=$(ERLANG_XCOMP_CONF)
+endef
+
+define ERLANG_BUILD_CMDS
+	# Run the bootstrap routines
+	cd $(@D) && $(HOST_MAKE_ENV) ./otp_build boot
+
+	# Update the SKIP files to specify which
+	# modules to compile. Don't compile a module
+	# unless it has been selected.
 	for i in $(@D)/lib/*; do \
-		[ -d $$i ] && touch $$i/SKIP; \
+		[ -d $$i ] && echo "See buildroot configuration to enable" > $$i/SKIP; \
 	done
 	for i in $(ERLANG_DONT_SKIP_APP); do \
 		rm $(@D)/lib/$$i/SKIP; \
 	done
-endef
 
-define ERLANG_BUILD_CMDS
-	cd $(@D) && $(HOST_MAKE_ENV) ./otp_build boot
-	cd $(@D) && $(HOST_MAKE_ENV) ./otp_build release
+	# Build everything (use -a to build everything, but 
+	# use SKIP files subset)
+	cd $(@D) && $(HOST_MAKE_ENV) ./otp_build release -a
 endef
 
 ERLANG_RELEASE_DIR=$(@D)/release/*
