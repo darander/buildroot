@@ -56,8 +56,17 @@ ERLANG_DONT_SKIP_APP += hipe
 ERLANG_CONFIGURE_FLAGS += --enable-hipe 
 endif
 
+ifeq ($(BR2_PACKAGE_ERLANG_ASN1),y)
+ERLANG_DONT_SKIP_APP += asn1 
+endif
 ifeq ($(BR2_PACKAGE_ERLANG_COMMON_TEST),y)
 ERLANG_DONT_SKIP_APP += common_test 
+endif
+ifeq ($(BR2_PACKAGE_ERLANG_DIALYZER),y)
+ERLANG_DONT_SKIP_APP += dialyzer 
+endif
+ifeq ($(BR2_PACKAGE_ERLANG_MNESIA),y)
+ERLANG_DONT_SKIP_APP += mnesia 
 endif
 ifeq ($(BR2_PACKAGE_ERLANG_RUNTIME_TOOLS),y)
 ERLANG_DONT_SKIP_APP += runtime_tools 

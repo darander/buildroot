@@ -15,31 +15,46 @@ config BR2_PACKAGE_ERLANG_HIPE
 	  Enable HiPE support in Erlang. This is a highly experimental
 	  feature right now.
 
-menu "Core applications"
-config BR2_PACKAGE_ERLANG_COMMON_TEST
-        bool "common_test application"
+menu "Core modules"
+config BR2_PACKAGE_ERLANG_ASN1
+        bool "asn1"
         help
-          common_test application for Erlang
+          asn1 module for Erlang
+
+config BR2_PACKAGE_ERLANG_COMMON_TEST
+        bool "common_test"
+        help
+          common_test module for Erlang
+
+config BR2_PACKAGE_ERLANG_DIALYZER
+        bool "dialyzer"
+        help
+          dialyzer module for Erlang
+
+config BR2_PACKAGE_ERLANG_MNESIA
+        bool "mnesia"
+        help
+          mnesia module for Erlang
 
 config BR2_PACKAGE_ERLANG_RUNTIME_TOOLS
-        bool "runtime_tools application"
+        bool "runtime_tools module"
         help
-          runtime_tools application for Erlang
+          runtime_tools module for Erlang
 
 config BR2_PACKAGE_ERLANG_SASL
-        bool "sasl application"
+        bool "sasl module"
         help
-          sasl application for Erlang
+          sasl module for Erlang
 
 config BR2_PACKAGE_ERLANG_TEST_SERVER
-        bool "test_server application"
+        bool "test_server module"
         help
-          test_server application for Erlang
+          test_server module for Erlang
 
 config BR2_PACKAGE_ERLANG_TOOLS
-        bool "tools application"
+        bool "tools module"
         help
-          tools application for Erlang
+          tools module for Erlang
 endmenu
 
 endif
