@@ -18,7 +18,7 @@ then
                 mke2fs -L bbone-user /dev/mmcblk0p3
 
                 # Mount our newly formatter user partition 
-                mount /mnt/user
+                mount /root
         fi
 
         echo "Clearing first time boot flag"
