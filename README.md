@@ -10,7 +10,7 @@ embedded Erlang nodes.  Packages can easily be added using Buildroot's
 Buildroot requires several packages to be installed on the system 
 before it can work. On Ubuntu, the following apt-get line is sufficient:
 
-    sudo apt-get install git-core bison flex g++ gettext texinfo libncurses5-dev
+    sudo apt-get install git-core bison flex g++ gettext texinfo libncurses5-dev qemu-user
 
 ## Building
 
