@@ -16,6 +16,12 @@ config BR2_PACKAGE_ERLANG_HIPE
 	  feature right now.
 
 menu "Core modules"
+config BR2_PACKAGE_ERLANG_APPMON
+        bool "appmon"
+	select BR2_PACKAGE_ERLANG_WEBTOOL
+        help
+          Application monitor and debug tool for Erlang
+
 config BR2_PACKAGE_ERLANG_ASN1
         bool "asn1"
         help
@@ -30,6 +36,11 @@ config BR2_PACKAGE_ERLANG_DIALYZER
         bool "dialyzer"
         help
           dialyzer module for Erlang
+
+config BR2_PACKAGE_ERLANG_INETS
+        bool "inets"
+        help
+          A set of services such as a web server and an ftp client
 
 config BR2_PACKAGE_ERLANG_MNESIA
         bool "mnesia"
@@ -55,6 +66,12 @@ config BR2_PACKAGE_ERLANG_TOOLS
         bool "tools module"
         help
           tools module for Erlang
+
+config BR2_PACKAGE_ERLANG_WEBTOOL
+        bool "webtool module"
+	select BR2_PACKAGE_ERLANG_INETS
+        help
+          WebTool application portal to web-based Erlang tools
 endmenu
 
 endif

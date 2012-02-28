@@ -49,6 +49,8 @@ ERLANG_CONFIGURE_FLAGS += --disable-threads --disable-smp \
 #
 # Target definitions
 #
+
+# The following modules are always present on the target
 ERLANG_DONT_SKIP_APP = stdlib kernel compiler 
 
 ifeq ($(BR2_PACKAGE_ERLANG_HIPE),y)
@@ -56,6 +58,9 @@ ERLANG_DONT_SKIP_APP += hipe
 ERLANG_CONFIGURE_FLAGS += --enable-hipe 
 endif
 
+ifeq ($(BR2_PACKAGE_ERLANG_APPMON),y)
+ERLANG_DONT_SKIP_APP += appmon 
+endif
 ifeq ($(BR2_PACKAGE_ERLANG_ASN1),y)
 ERLANG_DONT_SKIP_APP += asn1 
 endif
@@ -64,6 +69,9 @@ ERLANG_DONT_SKIP_APP += common_test
 endif
 ifeq ($(BR2_PACKAGE_ERLANG_DIALYZER),y)
 ERLANG_DONT_SKIP_APP += dialyzer 
+endif
+ifeq ($(BR2_PACKAGE_ERLANG_INETS),y)
+ERLANG_DONT_SKIP_APP += inets 
 endif
 ifeq ($(BR2_PACKAGE_ERLANG_MNESIA),y)
 ERLANG_DONT_SKIP_APP += mnesia 
@@ -79,6 +87,9 @@ ERLANG_DONT_SKIP_APP += test_server
 endif
 ifeq ($(BR2_PACKAGE_ERLANG_TOOLS),y)
 ERLANG_DONT_SKIP_APP += tools 
+endif
+ifeq ($(BR2_PACKAGE_ERLANG_WEBTOOL),y)
+ERLANG_DONT_SKIP_APP += webtool 
 endif
 
 ERLANG_XCOMP_CONF = $(ERLANG_DIR)/xcomp/erl-xcomp-buildroot.conf
