@@ -1,0 +1,36 @@
+From 3a2019e826d4d61f7f5924f5b5b43ca5c567f21e Mon Sep 17 00:00:00 2001
+From: Frank Hunleth <fhunleth@troodon-software.com>
+Date: Thu, 1 Mar 2012 05:27:00 -0800
+Subject: [PATCH] erts/configure.in: Update ARCH and OPSYS selection code to support AM335x
+
+Specifically, this adds support for host_os settings that specify ABI
+such as linux-uclibcgnueabi (previously, this was detected as noopsys).
+It also correctly sets the ARCH variable when host_cpu is just "arm".
+---
+ erts/configure.in |    3 ++-
+ 1 files changed, 2 insertions(+), 1 deletions(-)
+
+diff --git a/erts/configure.in b/erts/configure.in
+index b801994..f9826de 100644
+--- a/erts/configure.in
++++ b/erts/configure.in
+@@ -541,7 +541,7 @@ fi
+ case $chk_opsys_ in
+     win32)			OPSYS=win32;;
+     solaris2.*|SunOS5.*)	OPSYS=sol2;;
+-    linux|Linux)		OPSYS=linux;;
++    linux*|Linux)		OPSYS=linux;;
+     darwin|Darwin)		OPSYS=darwin;;
+     freebsd|FreeBSD)		OPSYS=freebsd;;
+     *)				OPSYS=noopsys
+@@ -568,6 +568,7 @@ case $chk_arch_ in
+     ppc)	ARCH=ppc;;
+     ppc64)	ARCH=ppc64;;
+     "Power Macintosh")	ARCH=ppc;;
++    arm)	ARCH=arm;;
+     armv5b)	ARCH=arm;;
+     armv5teb)	ARCH=arm;;
+     armv5tel)	ARCH=arm;;
+-- 
+1.7.4.1
+

@@ -1,0 +1,151 @@
+From 80ddef8e4a4d9f9d4a3f3a346e7e2fded3c5f794 Mon Sep 17 00:00:00 2001
+From: Frank Hunleth <fhunleth@troodon-software.com>
+Date: Thu, 1 Mar 2012 05:59:03 -0800
+Subject: [PATCH] Add the QEMU_USER variable to xcomp and use during HiPE compilation.
+
+This change adds support for cross-compiling HiPE to the standard
+build process and avoids the need to pause the build, run hipe_mkliterals
+on the target, copy the results, and then restart the build.
+---
+ aclocal.m4                    |    1 +
+ erl-build-tool-vars.sh        |    2 +-
+ erts/aclocal.m4               |    1 +
+ erts/emulator/Makefile.in     |    2 +-
+ lib/erl_interface/aclocal.m4  |    1 +
+ lib/hipe/rtl/Makefile         |    2 +-
+ lib/odbc/aclocal.m4           |    1 +
+ lib/wx/aclocal.m4             |    1 +
+ make/otp.mk.in                |    1 +
+ xcomp/erl-xcomp.conf.template |    8 ++++++++
+ 10 files changed, 17 insertions(+), 3 deletions(-)
+
+diff --git a/aclocal.m4 b/aclocal.m4
+index 339a15a..bba3b98 100644
+--- a/aclocal.m4
++++ b/aclocal.m4
+@@ -52,6 +52,7 @@ AC_ARG_VAR(LFS_LIBS, [large file support libraries (set all LFS_* variables or n
+ AC_ARG_VAR(RANLIB, [ranlib])
+ AC_ARG_VAR(AR, [ar])
+ AC_ARG_VAR(GETCONF, [getconf])
++AC_ARG_VAR(QEMU_USER, [qemu-user path and arguments for running cross-compiled executables])
+ 
+ dnl Cross system root
+ AC_ARG_VAR(erl_xcomp_sysroot, [Absolute cross system root path (only used when cross compiling)])
+diff --git a/erl-build-tool-vars.sh b/erl-build-tool-vars.sh
+index f66dc2d..531f24e 100644
+--- a/erl-build-tool-vars.sh
++++ b/erl-build-tool-vars.sh
+@@ -25,4 +25,4 @@
+ #    When updating, also update $ERL_TOP/xcomp/{README,erl-xcomp.conf.template},
+ #    and precious variables in $ERL_TOP/erts/aclocal.m4.
+ #
+-erl_build_tool_vars="CC CFLAGS STATIC_CFLAGS CFLAG_RUNTIME_LIBRARY_PATH CPP CPPFLAGS CXX CXXFLAGS LD LDFLAGS LIBS DED_LD DED_LDFLAGS DED_LD_FLAG_RUNTIME_LIBRARY_PATH LFS_CFLAGS LFS_LDFLAGS LFS_LIBS RANLIB AR GETCONF"
++erl_build_tool_vars="CC CFLAGS STATIC_CFLAGS CFLAG_RUNTIME_LIBRARY_PATH CPP CPPFLAGS CXX CXXFLAGS LD LDFLAGS LIBS DED_LD DED_LDFLAGS DED_LD_FLAG_RUNTIME_LIBRARY_PATH LFS_CFLAGS LFS_LDFLAGS LFS_LIBS RANLIB AR GETCONF QEMU_USER"
+diff --git a/erts/aclocal.m4 b/erts/aclocal.m4
+index 339a15a..bba3b98 100644
+--- a/erts/aclocal.m4
++++ b/erts/aclocal.m4
+@@ -52,6 +52,7 @@ AC_ARG_VAR(LFS_LIBS, [large file support libraries (set all LFS_* variables or n
+ AC_ARG_VAR(RANLIB, [ranlib])
+ AC_ARG_VAR(AR, [ar])
+ AC_ARG_VAR(GETCONF, [getconf])
++AC_ARG_VAR(QEMU_USER, [qemu-user path and arguments for running cross-compiled executables])
+ 
+ dnl Cross system root
+ AC_ARG_VAR(erl_xcomp_sysroot, [Absolute cross system root path (only used when cross compiling)])
+diff --git a/erts/emulator/Makefile.in b/erts/emulator/Makefile.in
+index 2bd7297..bf96601 100644
+--- a/erts/emulator/Makefile.in
++++ b/erts/emulator/Makefile.in
+@@ -868,7 +868,7 @@ $(OBJDIR)/hipe_mkliterals.o:	$(HIPE_ASM) $(TTF_DIR)/erl_alloc_types.h \
+ 	$(TTF_DIR)/OPCODES-GENERATED $(TARGET)/TABLES-GENERATED
+ 
+ $(TTF_DIR)/hipe_literals.h:	$(BINDIR)/hipe_mkliterals$(TF_MARKER)
+-	$(BINDIR)/hipe_mkliterals$(TF_MARKER) -c > $@
++	$(QEMU_USER) $(BINDIR)/hipe_mkliterals$(TF_MARKER) -c > $@
+ 
+ $(OBJDIR)/hipe_x86_glue.o:	hipe/hipe_x86_glue.S \
+ 	$(TTF_DIR)/hipe_x86_asm.h $(TTF_DIR)/hipe_literals.h \
+diff --git a/lib/erl_interface/aclocal.m4 b/lib/erl_interface/aclocal.m4
+index 339a15a..bba3b98 100644
+--- a/lib/erl_interface/aclocal.m4
++++ b/lib/erl_interface/aclocal.m4
+@@ -52,6 +52,7 @@ AC_ARG_VAR(LFS_LIBS, [large file support libraries (set all LFS_* variables or n
+ AC_ARG_VAR(RANLIB, [ranlib])
+ AC_ARG_VAR(AR, [ar])
+ AC_ARG_VAR(GETCONF, [getconf])
++AC_ARG_VAR(QEMU_USER, [qemu-user path and arguments for running cross-compiled executables])
+ 
+ dnl Cross system root
+ AC_ARG_VAR(erl_xcomp_sysroot, [Absolute cross system root path (only used when cross compiling)])
+diff --git a/lib/hipe/rtl/Makefile b/lib/hipe/rtl/Makefile
+index 3002683..40692bf 100644
+--- a/lib/hipe/rtl/Makefile
++++ b/lib/hipe/rtl/Makefile
+@@ -134,7 +134,7 @@ HIPE_MKLITERALS=$(ERL_TOP)/bin/$(TARGET)/hipe_mkliterals$(TYPE_STR)$(FLAVOR_STR)
+ 
+ 
+ hipe_literals.hrl: $(HIPE_MKLITERALS)
+-	$(HIPE_MKLITERALS) $(MKLIT_FLAGS) -e > hipe_literals.hrl
++	$(QEMU_USER) $(HIPE_MKLITERALS) $(MKLIT_FLAGS) -e > hipe_literals.hrl
+ 
+ # Need to generate hipe.hrl from one and only one target in one and only
+ # one makefile; otherwise, clearmake will force rebuilds of hipe over and
+diff --git a/lib/odbc/aclocal.m4 b/lib/odbc/aclocal.m4
+index 339a15a..bba3b98 100644
+--- a/lib/odbc/aclocal.m4
++++ b/lib/odbc/aclocal.m4
+@@ -52,6 +52,7 @@ AC_ARG_VAR(LFS_LIBS, [large file support libraries (set all LFS_* variables or n
+ AC_ARG_VAR(RANLIB, [ranlib])
+ AC_ARG_VAR(AR, [ar])
+ AC_ARG_VAR(GETCONF, [getconf])
++AC_ARG_VAR(QEMU_USER, [qemu-user path and arguments for running cross-compiled executables])
+ 
+ dnl Cross system root
+ AC_ARG_VAR(erl_xcomp_sysroot, [Absolute cross system root path (only used when cross compiling)])
+diff --git a/lib/wx/aclocal.m4 b/lib/wx/aclocal.m4
+index 339a15a..bba3b98 100644
+--- a/lib/wx/aclocal.m4
++++ b/lib/wx/aclocal.m4
+@@ -52,6 +52,7 @@ AC_ARG_VAR(LFS_LIBS, [large file support libraries (set all LFS_* variables or n
+ AC_ARG_VAR(RANLIB, [ranlib])
+ AC_ARG_VAR(AR, [ar])
+ AC_ARG_VAR(GETCONF, [getconf])
++AC_ARG_VAR(QEMU_USER, [qemu-user path and arguments for running cross-compiled executables])
+ 
+ dnl Cross system root
+ AC_ARG_VAR(erl_xcomp_sysroot, [Absolute cross system root path (only used when cross compiling)])
+diff --git a/make/otp.mk.in b/make/otp.mk.in
+index b9ab9dd..6212ea2 100644
+--- a/make/otp.mk.in
++++ b/make/otp.mk.in
+@@ -68,6 +68,7 @@ LD = @LD@
+ RANLIB = @RANLIB@
+ AR = @AR@
+ PERL = @PERL@
++QEMU_USER = @QEMU_USER@
+ 
+ BITS64 = @BITS64@
+ 
+diff --git a/xcomp/erl-xcomp.conf.template b/xcomp/erl-xcomp.conf.template
+index eb331ff..0bb9fce 100644
+--- a/xcomp/erl-xcomp.conf.template
++++ b/xcomp/erl-xcomp.conf.template
+@@ -145,6 +145,14 @@
+ #   not.
+ #GETCONF=
+ 
++# * `QEMU_USER' - The qemu-user application can run cross-compiled binaries
++#   locally on the host system. This is only used for cross compiling 
++#   HiPE support. 
++#   
++#   To use when cross-compiling to an ARM target, for example, set it
++#   to: "qemu-arm -L <target root library path>" 
++#QEMU_USER=
++
+ ## -- Cross System Root Locations ----------------------------------------------
+ 
+ # * `erl_xcomp_sysroot' - The absolute path to the system root of the cross
+-- 
+1.7.4.1
+

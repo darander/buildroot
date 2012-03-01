@@ -4,9 +4,13 @@
 #
 #############################################################
 
-ERLANG_VERSION = R15B
-ERLANG_SITE = http://erlang.org/download
-ERLANG_SOURCE = otp_src_$(ERLANG_VERSION).tar.gz
+#ERLANG_VERSION = R15B
+#ERLANG_SITE = http://erlang.org/download
+#ERLANG_SOURCE = otp_src_$(ERLANG_VERSION).tar.gz
+ERLANG_VERSION = master
+ERLANG_SITE = git://github.com/erlang/otp.git
+ERLANG_SITE_METHOD = git
+
 ERLANG_DEPENDENCIES = ncurses
 
 #
@@ -92,9 +96,20 @@ ifeq ($(BR2_PACKAGE_ERLANG_WEBTOOL),y)
 ERLANG_DONT_SKIP_APP += webtool 
 endif
 
+# Large file support for the xcomp file
+ifeq ($(BR2_LARGEFILE),y)
+ERLANG_LFS_CFLAGS = $(TARGET_CFLAGS)
+ERLANG_LFS_LDFLAGS = $(TARGET_LDFLAGS)
+ERLANG_LFS_LIBS = 
+endif
+
 ERLANG_XCOMP_CONF = $(ERLANG_DIR)/xcomp/erl-xcomp-buildroot.conf
 TARGET_CROSS_NAME = $(shell basename $(TARGET_CROSS) | sed "s/\-$$//")
 define ERLANG_CONFIGURE_CMDS
+	# Running autoconf on erlang to propogate changes made to
+	# autoconf files in the patches
+	cd $(@D) && $(HOST_MAKE_ENV) ./otp_build autoconf
+
 	echo "erl_xcomp_build=guess" > $(ERLANG_XCOMP_CONF)
 	echo "erl_xcomp_host=$(TARGET_CROSS_NAME)" >> $(ERLANG_XCOMP_CONF)
 	echo "erl_xcomp_configure_flags=\"$(ERLANG_CONFIGURE_FLAGS)\"" >> $(ERLANG_XCOMP_CONF)
@@ -105,7 +120,10 @@ define ERLANG_CONFIGURE_CMDS
 	echo "LD=$(TARGET_LD)" >> $(ERLANG_XCOMP_CONF)
 	echo "RANLIB=$(TARGET_RANLIB)" >> $(ERLANG_XCOMP_CONF)
 	echo "AR=$(TARGET_AR)" >> $(ERLANG_XCOMP_CONF)
-	echo "QEMU=\"qemu-arm -L $(TARGET_DIR)\"" >> $(ERLANG_XCOMP_CONF)
+	echo "QEMU_USER=\"qemu-arm -L $(TARGET_DIR)\"" >> $(ERLANG_XCOMP_CONF)
+	echo "LFS_CFLAGS=\"$(ERLANG_LFS_CFLAGS)\"" >> $(ERLANG_XCOMP_CONF)
+	echo "LFS_LDFLAGS=\"$(ERLANG_LFS_LDFLAGS)\"" >> $(ERLANG_XCOMP_CONF)
+	echo "LFS_LIBS=\"$(ERLANG_LFS_LIBS)\"" >> $(ERLANG_XCOMP_CONF)
 	echo "erl_xcomp_sysroot=$(STAGING_DIR)" >> $(ERLANG_XCOMP_CONF)
 	cd $(@D) && $(HOST_MAKE_ENV) ./otp_build configure --xcomp-conf=$(ERLANG_XCOMP_CONF)
 endef
