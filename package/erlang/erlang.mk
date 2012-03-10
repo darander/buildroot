@@ -4,12 +4,14 @@
 #
 #############################################################
 
-#ERLANG_VERSION = R15B
-#ERLANG_SITE = http://erlang.org/download
-#ERLANG_SOURCE = otp_src_$(ERLANG_VERSION).tar.gz
-ERLANG_VERSION = master
-ERLANG_SITE = git://github.com/erlang/otp.git
-ERLANG_SITE_METHOD = git
+ERLANG_VERSION = R15B
+ERLANG_SITE = http://erlang.org/download
+ERLANG_SOURCE = otp_src_$(ERLANG_VERSION).tar.gz
+
+# Uncomment the following to test against master
+#ERLANG_VERSION = master
+#ERLANG_SITE = git://github.com/erlang/otp.git
+#ERLANG_SITE_METHOD = git
 
 ERLANG_DEPENDENCIES = ncurses
 
