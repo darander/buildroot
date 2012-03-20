@@ -58,6 +58,6 @@ echo
 echo "Write to a MicroSD card by running:"
 echo
 echo "find /dev -name \"sdX?\" -exec umount \"{}\" \";\""
-echo "sudo dd if=$OUTPUTFILE of=/dev/sdX bs=128k"
+echo "sudo dd if=$OUTPUTFILE of=/dev/sdX bs=1M"
 echo "where sdX is where the MicroSD card was mounted."
 

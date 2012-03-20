@@ -42,7 +42,7 @@ unmount any partitions that were auto-mounted before writing the .img
 file. The commands should be something similar to the following:
 
     find /dev -name "sdX?" -exec umount "{}" ";"
-    sudo dd if=xxxxxxx.img of=/dev/sdX bs=128k
+    sudo dd if=xxxxxxx.img of=/dev/sdX bs=1M
 
 Replace sdX with the device for the MicroSD card. This can be found by
 looking at the end of `dmesg` after plugging in the MicroSD card. Be
