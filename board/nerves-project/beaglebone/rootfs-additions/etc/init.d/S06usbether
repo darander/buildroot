@@ -3,7 +3,7 @@
 case "$1" in
     start|"")
 	modprobe g_ether
-	ifup usb0
+	ifup usb0 &
 	;;
     stop) ;;
     *)
