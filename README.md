@@ -1,16 +1,28 @@
-# Erlang-powered Buildroot repo for the BeagleBone 
+# Erlang-focused Buildroot for the BeagleBone
 
 This README contains basic instructions for creating a system image
 for the BeagleBone using Buildroot. The image is meant for creating
-embedded Erlang nodes.  Packages can easily be added using Buildroot's 
-`make menuconfig` configuration editor. 
+embedded Erlang nodes.  Packages can easily be added using Buildroot's
+`make menuconfig` configuration editor.
 
 ## Preparing your system
 
-Buildroot requires several packages to be installed on the system 
+Buildroot requires several packages to be installed on the system
 before it can work. On Ubuntu, the following apt-get line is sufficient:
 
-    sudo apt-get install git-core bison flex g++ gettext texinfo libncurses5-dev qemu-user
+    sudo apt-get install git-core bison flex g++ gettext texinfo libncurses5-dev
+
+If you'd like to compile in HiPE support, qemu is currently needed. On
+recent distros it is sufficient to run "sudo apt-get install qemu-user" or
+similar. On Ubuntu 10.04, the default version of qemu is too old.
+
+Download qemu from
+http://wiki.qemu.org/Download and compile from source by running the
+following:
+
+    ./configure --target-list=arm-linux-user
+    make
+    sudo make install
 
 ## Building
 
@@ -51,7 +63,7 @@ unbootable.
 
 ## Updating the Root FS on the BeagleBone
 
-The Root FS is configured to mount read-only on the BeagleBone. This is done 
+The Root FS is configured to mount read-only on the BeagleBone. This is done
 to prevent data corruption from unsafe shutdowns and as a reminder that all
 configuration and new packages have to end up in the buildroot configuration.
 
@@ -59,5 +71,5 @@ Since this can be annoying during debug, the rootfs can be mounted by running:
 
     mount -o remount,rw /
 
- 
- 
+
+
