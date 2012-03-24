@@ -73,6 +73,9 @@ endif
 ifeq ($(BR2_PACKAGE_ERLANG_COMMON_TEST),y)
 ERLANG_DONT_SKIP_APP += common_test 
 endif
+ifeq ($(BR2_PACKAGE_ERLANG_DEBUGGER),y)
+ERLANG_DONT_SKIP_APP += debugger
+endif
 ifeq ($(BR2_PACKAGE_ERLANG_DIALYZER),y)
 ERLANG_DONT_SKIP_APP += dialyzer 
 endif

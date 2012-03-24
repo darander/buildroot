@@ -32,6 +32,11 @@ config BR2_PACKAGE_ERLANG_COMMON_TEST
         help
           common_test module for Erlang
 
+config BR2_PACKAGE_ERLANG_DEBUGGER
+        bool "debugger"
+        help
+          debugger module for Erlang
+
 config BR2_PACKAGE_ERLANG_DIALYZER
         bool "dialyzer"
         help
