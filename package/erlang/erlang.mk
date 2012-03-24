@@ -94,6 +94,9 @@ endif
 ifeq ($(BR2_PACKAGE_ERLANG_SASL),y)
 ERLANG_DONT_SKIP_APP += sasl 
 endif
+ifeq ($(BR2_PACKAGE_ERLANG_SSH),y)
+ERLANG_DONT_SKIP_APP += ssh
+endif
 ifeq ($(BR2_PACKAGE_ERLANG_TEST_SERVER),y)
 ERLANG_DONT_SKIP_APP += test_server 
 endif

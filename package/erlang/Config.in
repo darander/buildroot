@@ -67,6 +67,11 @@ config BR2_PACKAGE_ERLANG_SASL
         help
           sasl module for Erlang
 
+config BR2_PACKAGE_ERLANG_SSH
+        bool "ssh module"
+        help
+          ssh module for Erlang
+
 config BR2_PACKAGE_ERLANG_TEST_SERVER
         bool "test_server module"
         help
