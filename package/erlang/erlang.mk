@@ -82,6 +82,9 @@ endif
 ifeq ($(BR2_PACKAGE_ERLANG_MNESIA),y)
 ERLANG_DONT_SKIP_APP += mnesia 
 endif
+ifeq ($(BR2_PACKAGE_ERLANG_OBSERVER),y)
+ERLANG_DONT_SKIP_APP += observer
+endif
 ifeq ($(BR2_PACKAGE_ERLANG_RUNTIME_TOOLS),y)
 ERLANG_DONT_SKIP_APP += runtime_tools 
 endif

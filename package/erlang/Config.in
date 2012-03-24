@@ -47,6 +47,11 @@ config BR2_PACKAGE_ERLANG_MNESIA
         help
           mnesia module for Erlang
 
+config BR2_PACKAGE_ERLANG_OBSERVER
+        bool "observer"
+        help
+          observer module for Erlang
+
 config BR2_PACKAGE_ERLANG_RUNTIME_TOOLS
         bool "runtime_tools module"
         help
