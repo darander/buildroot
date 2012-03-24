@@ -72,6 +72,12 @@ config BR2_PACKAGE_ERLANG_SSH
         help
           ssh module for Erlang
 
+config BR2_PACKAGE_ERLANG_SSL
+        bool "ssl module"
+	select BR2_PACKAGE_OPENSSL
+        help
+          ssl module for Erlang
+
 config BR2_PACKAGE_ERLANG_TEST_SERVER
         bool "test_server module"
         help

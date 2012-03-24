@@ -97,6 +97,11 @@ endif
 ifeq ($(BR2_PACKAGE_ERLANG_SSH),y)
 ERLANG_DONT_SKIP_APP += ssh
 endif
+ifeq ($(BR2_PACKAGE_ERLANG_SSL),y)
+ERLANG_CONFIGURE_FLAGS += --with-ssl
+ERLANG_DONT_SKIP_APP += ssl
+ERLANG_DEPENDENCIES += openssl
+endif
 ifeq ($(BR2_PACKAGE_ERLANG_TEST_SERVER),y)
 ERLANG_DONT_SKIP_APP += test_server 
 endif
