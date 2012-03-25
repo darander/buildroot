@@ -181,4 +181,8 @@ define ERLANG_INSTALL_TARGET_CMDS
 endef
 
 $(eval $(call GENTARGETS))
+
+# Currently need to run autoreconf since one of the patches modifies
+# a configure.in
+HOST_ERLANG_AUTORECONF = YES
 $(eval $(call AUTOTARGETS,host))
