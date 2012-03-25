@@ -1,0 +1,32 @@
+This document tracks which packages are included in the nerves-project
+default build and the reasons for their inclusion. In the spirit of
+buildroot, we aim to include a minimal set of packages so that the
+resulting images are small, but useful. It should be possible for a
+beginner user to come up quickly and get simple apps to work. Every
+application, peripheral or feature does not need to be enabled, since
+buildroot lets users that need specific features to produce their
+own image easily. Also, since builds are minimal, the hope is that
+new users will be able to browse around the root filesystem and become
+comfortable with it. They should not have to concern themselves with
+complicated setups initially. For example, wireless LAN support can be
+quite complicated for a new user when they deal with it on an embedded
+system. Many users don't need this or the infrastructure they require,
+but for those that do, we plan to document how to add it in a How To.
+
+Enabled packages		Reason
+----------------		------
+Busybox				General Linux command line utilities
+lsof, strace			Debugging utilities
+pv				Anticipated need for software image
+				update progress bar
+git				Develop on board (may not be needed)
+erlang				This is the point of the nerves-project!
+avahi				Zero-conf for the USB ethernet interface
+dropbear			ssh/scp
+ethtool				Debug Beaglebone Ethernet PHY issue
+				(remove when resolved)
+rsync				Sync development files on the host
+				with the Beaglebone
+dialog				Board setup menus
+uemacs				Lots of people like emacs
+
