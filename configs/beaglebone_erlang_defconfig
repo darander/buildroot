@@ -2,6 +2,8 @@ BR2_arm=y
 BR2_cortex_a8=y
 BR2_BACKUP_SITE="http://files.troodon-software.com/br"
 BR2_JLEVEL=8
+BR2_EXTRA_GCC_CONFIG_OPTIONS="--with-fpu=vfp --with-float=hard"
+# BR2_SOFT_FLOAT is not set
 BR2_TOOLCHAIN_BUILDROOT_LARGEFILE=y
 BR2_TOOLCHAIN_BUILDROOT_LOCALE=y
 BR2_TOOLCHAIN_BUILDROOT_CXX=y
