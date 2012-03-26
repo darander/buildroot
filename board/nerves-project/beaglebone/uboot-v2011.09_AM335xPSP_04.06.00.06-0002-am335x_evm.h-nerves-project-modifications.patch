@@ -1,0 +1,30 @@
+From eb8834e9a987b4cde55c4f5a72d1113aacfe08d0 Mon Sep 17 00:00:00 2001
+From: Frank Hunleth <fhunleth@troodon-software.com>
+Date: Sun, 25 Mar 2012 22:45:41 -0400
+Subject: [PATCH] am335x_evm.h: nerves-project modifications
+
+Turn on zero boot delay to reduce race condition where junk characters
+break into the u-boot shell.
+
+Signed-off-by: Frank Hunleth <fhunleth@troodon-software.com>
+---
+ include/configs/am335x_evm.h |    3 ++-
+ 1 files changed, 2 insertions(+), 1 deletions(-)
+
+diff --git a/include/configs/am335x_evm.h b/include/configs/am335x_evm.h
+index b45c306..35c4968 100755
+--- a/include/configs/am335x_evm.h
++++ b/include/configs/am335x_evm.h
+@@ -40,7 +40,8 @@
+ #define CONFIG_INITRD_TAG		/* Required for ramdisk support */
+ 
+ /* set to negative value for no autoboot */
+-#define CONFIG_BOOTDELAY		3
++#define CONFIG_BOOTDELAY		0
++#define CONFIG_ZERO_BOOTDELAY_CHECK
+ 
+ #define CONFIG_MMC
+ #define CONFIG_NAND
+-- 
+1.7.0.4
+
