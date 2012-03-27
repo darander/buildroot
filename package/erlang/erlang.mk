@@ -47,7 +47,7 @@ ERLANG_CONFIGURE_FLAGS = --prefix=/usr \
                 $(SHARED_STATIC_LIBS_OPTS) \
                 $(QUIET) 
 
-ERLANG_CONFIGURE_FLAGS += --disable-threads --disable-smp \
+ERLANG_CONFIGURE_FLAGS += --disable-smp \
 		--disable-megaco-flex-scanner-lineno \
 		--disable-megaco-reentrant-flex-scanner \
 		--without-javac
