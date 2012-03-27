@@ -17,8 +17,11 @@ then
                 echo "Performing first time format of /mnt/user (/dev/mmcblk0p3)"
                 mke2fs -L bbone-user /dev/mmcblk0p3
 
-                # Mount our newly formatter user partition 
+                # Mount our newly formatted user partition 
                 mount /root
+
+		# Create the default directory hierarchy
+		mkdir -p /root/.ssh
         fi
 
         echo "Clearing first time boot flag"
