@@ -16,10 +16,6 @@ but for those that do, we plan to document how to add it in a How To.
 Enabled packages		Reason
 ----------------		------
 Busybox				General Linux command line utilities
-lsof, strace			Debugging utilities
-pv				Anticipated need for software image
-				update progress bar
-git				Develop on board (may not be needed)
 erlang				This is the point of the nerves-project!
 avahi				Zero-conf for the USB ethernet interface
 dropbear			ssh/scp
@@ -29,4 +25,8 @@ rsync				Sync development files on the host
 				with the Beaglebone
 dialog				Board setup menus
 uemacs				Lots of people like emacs
-
+pv				Anticipated need for software image
+				update progress bar
+git				Develop on board (large package)
+gcc				Develop on board (very large package!!)
+lsof, strace			Debugging utilities (not large, but can be removed)

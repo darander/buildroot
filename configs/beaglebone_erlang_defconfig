@@ -2,6 +2,7 @@ BR2_arm=y
 BR2_cortex_a8=y
 BR2_BACKUP_SITE="http://files.troodon-software.com/br"
 BR2_JLEVEL=8
+BR2_HAVE_DEVFILES=y
 BR2_EXTRA_GCC_CONFIG_OPTIONS="--with-fpu=vfp --with-float=hard"
 # BR2_SOFT_FLOAT is not set
 BR2_TOOLCHAIN_BUILDROOT_LARGEFILE=y
@@ -18,6 +19,7 @@ BR2_PACKAGE_BUSYBOX_CONFIG="board/nerves-project/beaglebone/busybox_defconfig"
 BR2_PACKAGE_LSOF=y
 BR2_PACKAGE_STRACE=y
 BR2_PACKAGE_PV=y
+BR2_PACKAGE_GCC_TARGET=y
 BR2_PACKAGE_GIT=y
 BR2_PACKAGE_ERLANG=y
 BR2_PACKAGE_ERLANG_HIPE=y
