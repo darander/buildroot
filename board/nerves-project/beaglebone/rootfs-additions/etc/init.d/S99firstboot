@@ -21,7 +21,11 @@ then
                 mount /root
 
 		# Create the default directory hierarchy
+
+		# SSH keys
 		mkdir -p /root/.ssh
+		# Deployment location for Erlang apps in development
+		mkdir -p /root/apps
         fi
 
         echo "Clearing first time boot flag"
