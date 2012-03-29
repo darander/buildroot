@@ -63,6 +63,11 @@ ifeq ($(BR2_PACKAGE_ERLANG_HIPE),y)
 ERLANG_DONT_SKIP_APP += hipe 
 ERLANG_CONFIGURE_FLAGS += --enable-hipe 
 endif
+ifeq ($(BR2_PACKAGE_ERLANG_ASYNCHRONOUS_THREADS),y)
+ERLANG_CONFIGURE_FLAGS += --enable-threads
+else
+ERLANG_CONFIGURE_FLAGS += --disable-threads
+endif
 
 ifeq ($(BR2_PACKAGE_ERLANG_APPMON),y)
 ERLANG_DONT_SKIP_APP += appmon 

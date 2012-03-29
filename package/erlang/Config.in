@@ -10,10 +10,15 @@ config BR2_PACKAGE_ERLANG
 if BR2_PACKAGE_ERLANG
 
 config BR2_PACKAGE_ERLANG_HIPE
-        bool "HiPE - Experimental!"
+        bool "HiPE"
         help
 	  Enable HiPE support in Erlang. This is a highly experimental
 	  feature right now.
+
+config BR2_PACKAGE_ERLANG_ASYNCHRONOUS_THREADS
+        bool "asynchronous threads"
+        help
+	  Enable support for asynchronous threads.
 
 menu "Core modules"
 config BR2_PACKAGE_ERLANG_APPMON

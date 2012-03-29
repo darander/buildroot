@@ -1,0 +1,26 @@
+From b05da5b048743ec0ec93f3d15d09429b094bd486 Mon Sep 17 00:00:00 2001
+From: Frank Hunleth <fhunleth@troodon-software.com>
+Date: Wed, 28 Mar 2012 21:44:18 -0400
+Subject: [PATCH] Fix --disable-threads issue
+
+Fix from Rickard Green on erlang-questions
+---
+ erts/emulator/sys/common/erl_poll.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/erts/emulator/sys/common/erl_poll.c b/erts/emulator/sys/common/erl_poll.c
+index b6cb271..0409a55 100644
+--- a/erts/emulator/sys/common/erl_poll.c
++++ b/erts/emulator/sys/common/erl_poll.c
+@@ -2143,7 +2143,7 @@ ERTS_POLL_EXPORT(erts_poll_wait)(ErtsPollSet ps,
+ void
+ ERTS_POLL_EXPORT(erts_poll_interrupt)(ErtsPollSet ps, int set)
+ {
+-#if defined(USE_THREADS)
++#if defined(USE_THREADS) || ERTS_POLL_ASYNC_INTERRUPT_SUPPORT
+     if (!set)
+ 	reset_wakeup_state(ps);
+     else
+-- 
+1.7.0.4
+
