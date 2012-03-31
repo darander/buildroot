@@ -1,0 +1,8 @@
+config BR2_PACKAGE_IIOUTILS
+	bool "iioutils"
+	select BR2_PACKAGE_LIBSYSFS
+	help
+	  Utility programs associate with the Linux kernel industrial I/O
+	  framework. Similar in purpose to lsusb.
+
+	  http://iioutils.sourceforge.net/
