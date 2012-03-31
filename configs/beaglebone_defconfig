@@ -1,7 +1,7 @@
 BR2_arm=y
 BR2_cortex_a8=y
 BR2_JLEVEL=8
-BR2_EXTRA_GCC_CONFIG_OPTIONS="--with-fpu=vfp --with-float=hard"
+BR2_EXTRA_GCC_CONFIG_OPTIONS="--with-fpu=vfpv3 --with-float=hard"
 # BR2_SOFT_FLOAT is not set
 BR2_TARGET_GENERIC_HOSTNAME="beaglebone"
 BR2_ROOTFS_DEVICE_CREATION_DYNAMIC_DEVTMPFS=y
