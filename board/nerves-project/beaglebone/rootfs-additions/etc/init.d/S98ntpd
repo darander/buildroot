@@ -1,0 +1,15 @@
+#!/bin/sh
+
+case "$1" in
+    start|"")
+	ntpd -p pool.ntp.org
+	;;
+    stop)
+	killall ntpd
+	;;
+    *)
+	echo "Usage: $0 {start|stop}" >&2
+	exit 1
+	;;
+esac
+
