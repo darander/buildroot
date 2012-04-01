@@ -7,9 +7,3 @@ auto eth0
 iface eth0 inet dhcp
   hostname `hostname`
 
-# Debug Ethernet interface throught the USB port
-# Specify DHCP, but under normal operation, avahi
-# should assign a link local IP address
-iface usb0 inet dhcp
-  hostname `hostname`-dbg
-

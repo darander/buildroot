@@ -2,8 +2,17 @@
 
 case "$1" in
     start|"")
-	modprobe g_ether
-	ifup usb0 &
+	# Comment out. This doesn't work all that well.
+	# Problems include:
+	#    Random MAC used each boot
+	#    Takes a long time to give up on dhcp and assign link local
+	#    Random errors on console
+	#    Didn't get it to work in windows
+	# I'm leaving this since it doesn't seem like a terrible idea
+	# to connect over USB to the host. It's just too much trouble
+	# now.
+	#modprobe g_ether
+	#ifup usb0 &
 	;;
     stop) ;;
     *)

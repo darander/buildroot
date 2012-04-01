@@ -15,9 +15,8 @@ but for those that do, we plan to document how to add it in a How To.
 
 Enabled packages		Reason
 ----------------		------
+erlang				If there were one package to enable...
 Busybox				General Linux command line utilities
-erlang				This is the point of the nerves-project!
-avahi				Zero-conf for the USB ethernet interface
 dropbear			ssh/scp
 ethtool				Debug Beaglebone Ethernet PHY issue
 				(remove when resolved)
@@ -28,3 +27,9 @@ uemacs				Lots of people like emacs
 git				Develop on board (large package)
 gcc				Develop on board (very large package!!)
 strace				Debugging utilities (not large, but can be removed)
+
+Formerly enabled packages	Reason
+-------------------------	------
+avahi				Errors on console, didn't work great.
+				Probably not avahi's fault.
+
