@@ -60,4 +60,8 @@ echo
 echo "find /dev -name \"sdX?\" -exec umount \"{}\" \";\""
 echo "sudo dd if=$OUTPUTFILE of=/dev/sdX bs=1M"
 echo "where sdX is where the MicroSD card was mounted."
+echo
+echo "Or just run:"
+echo "./program_sdcard.sh $OUTPUTFILE sdX"
+echo "==================================================================="
 
