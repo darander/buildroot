@@ -4,7 +4,7 @@
 #
 #############################################################
 
-FFMPEG_VERSION = 0.8.8
+FFMPEG_VERSION = 0.8.11
 FFMPEG_SOURCE = ffmpeg-$(FFMPEG_VERSION).tar.bz2
 FFMPEG_SITE = http://ffmpeg.org/releases
 FFMPEG_INSTALL_STAGING = YES
@@ -150,7 +150,7 @@ endif
 # Set powerpc altivec appropriately
 ifeq ($(BR2_powerpc),y)
 ifeq ($(BR2_powerpc_7400)$(BR2_powerpc_7450)$(BR2_powerpc_970),y)
-FFMPEG_CONF_OPT -= --enable-altivec
+FFMPEG_CONF_OPT += --enable-altivec
 else
 FFMPEG_CONF_OPT += --disable-altivec
 endif

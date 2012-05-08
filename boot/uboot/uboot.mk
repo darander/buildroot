@@ -88,16 +88,11 @@ define UBOOT_BUILD_CMDS
 		$(UBOOT_MAKE_TARGET)
 endef
 
-ifeq ($(BR2_TARGET_UBOOT_MLO),y)
 define UBOOT_INSTALL_IMAGES_CMDS
 	cp -dpf $(@D)/$(UBOOT_BIN) $(BINARIES_DIR)/
-	cp -dpf $(@D)/MLO $(BINARIES_DIR)/
+	$(if $(BR2_TARGET_UBOOT_SPL),
+		cp -dpf $(@D)/$(BR2_TARGET_UBOOT_SPL_NAME) $(BINARIES_DIR)/)
 endef
-else
-define UBOOT_INSTALL_IMAGES_CMDS
-	cp -dpf $(@D)/$(UBOOT_BIN) $(BINARIES_DIR)/
-endef
-endif
 
 $(eval $(call GENTARGETS))
 

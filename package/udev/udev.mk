@@ -3,7 +3,7 @@
 # udev
 #
 #############################################################
-UDEV_VERSION = 181
+UDEV_VERSION = 182
 UDEV_SOURCE = udev-$(UDEV_VERSION).tar.bz2
 UDEV_SITE = $(BR2_KERNEL_MIRROR)/linux/utils/kernel/hotplug/
 UDEV_INSTALL_STAGING = YES
@@ -33,6 +33,10 @@ UDEV_CONF_OPT +=		\
 else
 UDEV_CONF_OPT +=		\
 	--disable-gudev
+endif
+
+ifeq ($(BR2_PACKAGE_SYSTEMD),y)
+	UDEV_CONF_OPT += --with-systemdsystemunitdir=/lib/systemd/system/
 endif
 
 define UDEV_INSTALL_INITSCRIPT

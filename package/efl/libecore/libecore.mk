@@ -12,7 +12,13 @@ LIBECORE_INSTALL_STAGING = YES
 LIBECORE_DEPENDENCIES = host-pkg-config libeina
 
 HOST_LIBECORE_DEPENDENCIES = host-pkg-config host-libeina host-libevas
-HOST_LIBECORE_CONF_OPT += --enable-ecore-evas
+HOST_LIBECORE_CONF_OPT += 		\
+	--enable-ecore-evas 		\
+	--disable-simple-x11 		\
+	--disable-ecore-directfb 	\
+	--disable-ecore-x 		\
+	--disable-ecore-x-xcb 		\
+	--disable-ecore-imf-xim
 
 # default options
 LIBECORE_CONF_OPT = --disable-simple-x11
@@ -67,7 +73,7 @@ endif
 
 ifeq ($(BR2_PACKAGE_LIBECORE_X_XCB),y)
 LIBECORE_CONF_OPT += --enable-ecore-x-xcb
-LIBECORE_DEPENDENCIES += libxcb xlib_libX11 xcb-util
+LIBECORE_DEPENDENCIES += libxcb xlib_libX11 xcb-util pixman
 
 # src/util/makekeys is executed at build time to generate
 # ecore_xcb_keysym_table.h, so it should get compiled for the host.
@@ -76,11 +82,10 @@ LIBECORE_DEPENDENCIES += libxcb xlib_libX11 xcb-util
 # teach it about CC_FOR_BUILD, but for now simply build makekeys by
 # hand in advance
 define LIBECORE_BUILD_MAKEKEYS_FOR_HOST
-	cd $(@D)/src/util && $(HOSTCC) $(HOST_CFLAGS) $(HOST_LDFLAGS) \
-		-o makekeys makekeys.c
+	$(HOST_CONFIGURE_OPTS) $(MAKE1) -C $(@D)/src/util makekeys.o makekeys
 endef
 
-LIBECORE_POST_CONFIGURE_HOOKS += LIBECORE_BUILD_MAKEKEYS_FOR_HOST
+LIBECORE_POST_EXTRACT_HOOKS += LIBECORE_BUILD_MAKEKEYS_FOR_HOST
 else
 LIBECORE_CONF_OPT += --disable-ecore-x-xcb
 endif
