@@ -228,15 +228,12 @@ endchoice
 choice
 	prompt "Target ABI"
 	depends on BR2_bfin
-	default BR2_BFIN_FLAT
+	default BR2_BFIN_FDPIC
 config BR2_BFIN_FDPIC
 	bool "FDPIC"
 config BR2_BFIN_FLAT
 	bool "FLAT"
-config BR2_BFIN_FLAT_SEP_DATA
-	bool "FLAT (Separate data)"
-config BR2_BFIN_SHARED_FLAT
-	bool "Shared FLAT"
+	select BR2_PREFER_STATIC_LIB
 endchoice
 
 choice
@@ -600,6 +597,7 @@ config BR2_ARCH
 	default "i686"		if BR2_x86_pentium4
 	default "i686"		if BR2_x86_pentium_m
 	default "i686"		if BR2_x86_pentiumpro
+	default "i686"		if BR2_x86_prescott
 	default "i686"		if BR2_x86_nocona
 	default "i686"		if BR2_x86_core2
 	default "i686"		if BR2_x86_atom
