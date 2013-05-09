@@ -1,0 +1,4 @@
+config BR2_PACKAGE_AM33X_CM3
+	bool "am33x-cm3"
+	help
+	  Cortex-M3 binary blob for suspend-resume
