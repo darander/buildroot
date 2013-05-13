@@ -4,7 +4,7 @@
 #
 #############################################################
 
-MESA3D_VERSION = 7.10.1
+MESA3D_VERSION = 7.10.3
 MESA3D_SOURCE = MesaLib-$(MESA3D_VERSION).tar.gz
 MESA3D_SITE = ftp://ftp.freedesktop.org/pub/mesa/$(MESA3D_VERSION)
 MESA3D_AUTORECONF = YES
@@ -30,6 +30,8 @@ MESA3D_DEPENDENCIES = \
 	expat \
 	host-xutil_makedepend \
 	host-libxml2 \
-	host-python
+	host-python \
+	host-bison \
+	host-flex
 
 $(eval $(autotools-package))

@@ -3,7 +3,7 @@
 # libdrm
 #
 #############################################################
-LIBDRM_VERSION = 2.4.23
+LIBDRM_VERSION = 2.4.38
 LIBDRM_SOURCE = libdrm-$(LIBDRM_VERSION).tar.bz2
 LIBDRM_SITE = http://dri.freedesktop.org/libdrm/
 LIBDRM_INSTALL_STAGING = YES
@@ -13,8 +13,9 @@ LIBDRM_DEPENDENCIES = \
 	xproto_xf86vidmodeproto \
 	xlib_libXxf86vm \
 	xlib_libXmu \
+	xlib_libpciaccess \
 	xproto_dri2proto \
-	pthread-stubs \
+	xlib_libpthread-stubs \
 	host-pkgconf
 
 ifeq ($(BR2_PACKAGE_XDRIVER_XF86_VIDEO_INTEL),y)

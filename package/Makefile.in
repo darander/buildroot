@@ -56,7 +56,17 @@ TARGET_ABI+=-mabi=spe -mfloat-gprs=double -Wa,-me500mc
 endif
 endif
 
-STAGING_DIR=$(HOST_DIR)/usr/$(GNU_TARGET_NAME)/sysroot
+# Use longcalls option for Xtensa globally.
+# The 'longcalls' option allows calls across a greater range of addresses,
+# and is required for some packages. While this option can degrade both
+# code size and performance, the linker can usually optimize away the
+# overhead when a call ends up within a certain range.
+ifeq ($(BR2_xtensa),y)
+TARGET_ABI += -mlongcalls
+endif
+
+STAGING_SUBDIR = usr/$(GNU_TARGET_NAME)/sysroot
+STAGING_DIR    = $(HOST_DIR)/$(STAGING_SUBDIR)
 
 TARGET_OPTIMIZATION:=$(call qstrip,$(BR2_TARGET_OPTIMIZATION))
 
@@ -92,6 +102,21 @@ endif
 TARGET_CFLAGS = $(TARGET_CPPFLAGS) $(TARGET_ABI) $(TARGET_OPTIMIZATION) $(TARGET_DEBUGGING)
 TARGET_CXXFLAGS = $(TARGET_CFLAGS)
 TARGET_LDFLAGS = $(call qstrip,$(BR2_TARGET_LDFLAGS))
+
+ifeq ($(BR2_BINFMT_FLAT),y)
+TARGET_LDFLAGS += $(if $($(PKG)_FLAT_STACKSIZE),-Wl$(comma)-elf2flt=-s$($(PKG)_FLAT_STACKSIZE))
+endif
+
+ifeq ($(BR2_BINFMT_FLAT_SHARED),y)
+TARGET_LDFLAGS += -mid-shared-library -mshared-library-id=0
+TARGET_CFLAGS += -mid-shared-library -mshared-library-id=0
+TARGET_CXXFLAGS += -mid-shared-library -mshared-library-id=0
+endif
+ifeq ($(BR2_BINFMT_FLAT_SEP_DATA),y)
+TARGET_LDFLAGS += -msep-data
+TARGET_CFLAGS += -msep-data
+TARGET_CXXFLAGS += -msep-data
+endif
 
 ifeq ($(BR2_TOOLCHAIN_BUILDROOT)$(BR2_TOOLCHAIN_CTNG),y)
 TARGET_CROSS=$(HOST_DIR)/usr/bin/$(GNU_TARGET_NAME)-
@@ -281,7 +306,15 @@ DISABLE_LARGEFILE= --disable-largefile
 endif
 
 ifneq ($(BR2_HAVE_DOCUMENTATION),y)
-DISABLE_DOCUMENTATION=--disable-gtk-doc
+# The configure option varies, but since unknown options are ignored
+# we can pass all of them.
+DISABLE_DOCUMENTATION = \
+	--disable-gtk-doc \
+	--disable-doc \
+	--disable-docs \
+	--disable-documentation \
+	--with-xmlto=no \
+	--with-fop=no
 endif
 
 ifeq ($(BR2_INET_IPV6),y)
@@ -302,7 +335,7 @@ endif
 
 ifeq ($(BR2_PREFER_STATIC_LIB),y)
 SHARED_STATIC_LIBS_OPTS=--enable-static --disable-shared
-TARGET_LDFLAGS += -static
+TARGET_LDFLAGS += --static
 else
 SHARED_STATIC_LIBS_OPTS=--enable-static --enable-shared
 endif

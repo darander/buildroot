@@ -39,6 +39,14 @@ HOST_PYTHON_MAKE_ENV = \
 
 HOST_PYTHON_AUTORECONF = YES
 
+# Building host python in parallel sometimes triggers a "Bus error"
+# during the execution of "./python setup.py build" in the
+# installation step. It is probably due to the installation of a
+# shared library taking place in parallel to the execution of
+# ./python, causing spurious Bus error. Building host-python with
+# MAKE1 has shown to workaround the problem.
+HOST_PYTHON_MAKE = $(MAKE1)
+
 PYTHON_DEPENDENCIES  = host-python libffi
 
 HOST_PYTHON_DEPENDENCIES = host-expat host-zlib
@@ -100,6 +108,10 @@ else
 PYTHON_CONF_OPT += --disable-zlib
 endif
 
+ifeq ($(BR2_PACKAGE_PYTHON_HASHLIB),y)
+PYTHON_DEPENDENCIES += openssl
+endif
+
 PYTHON_CONF_ENV += \
 	PYTHON_FOR_BUILD=$(HOST_PYTHON_DIR)/python \
 	PGEN_FOR_BUILD=$(HOST_PYTHON_DIR)/Parser/pgen \
@@ -129,6 +141,13 @@ define PYTHON_FIXUP_LIBDIR
 endef
 
 PYTHON_POST_INSTALL_STAGING_HOOKS += PYTHON_FIXUP_LIBDIR
+
+# Bad shebang, normally not used
+define PYTHON_REMOVE_SMTPD
+	rm -f $(TARGET_DIR)/usr/bin/smtpd.py
+endef
+
+PYTHON_POST_INSTALL_TARGET_HOOKS += PYTHON_REMOVE_SMTPD
 
 #
 # Development files removal

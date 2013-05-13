@@ -5,9 +5,11 @@
 #############################################################
 NEON_VERSION = 0.29.6
 NEON_SITE = http://www.webdav.org/neon/
+NEON_LICENSE = LGPLv2+ (library), GPLv2+ (manual and tests)
+NEON_LICENSE_FILES = src/COPYING.LIB src/COPYING README
 NEON_INSTALL_STAGING = YES
 NEON_CONF_OPT = --without-gssapi --disable-rpath
-
+NEON_CONFIG_SCRIPTS = neon-config
 NEON_DEPENDENCIES = host-pkgconf
 
 ifeq ($(BR2_PACKAGE_NEON_ZLIB),y)
@@ -42,14 +44,6 @@ endif
 ifeq ($(BR2_PACKAGE_NEON_NOXML),y)
 # webdav needs xml support
 NEON_CONF_OPT += --disable-webdav
-endif
-
-define NEON_REMOVE_CONFIG_SCRIPTS
-	$(RM) -f $(TARGET_DIR)/usr/bin/neon-config
-endef
-
-ifneq ($(BR2_HAVE_DEVFILES),y)
-NEON_POST_INSTALL_TARGET_HOOKS += NEON_REMOVE_CONFIG_SCRIPTS
 endif
 
 $(eval $(autotools-package))

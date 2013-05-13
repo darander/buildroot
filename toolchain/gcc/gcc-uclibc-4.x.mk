@@ -26,11 +26,13 @@ GCC_SNAP_DATE:=
 endif
 
 ifneq ($(GCC_SNAP_DATE),)
- GCC_SITE:=ftp://sources.redhat.com/pub/gcc/snapshots/$(GCC_VERSION)
+ GCC_SITE:=ftp://gcc.gnu.org/pub/gcc/snapshots/$(GCC_SNAP_DATE)/
 else ifeq ($(findstring avr32,$(GCC_VERSION)),avr32)
  GCC_SITE:=ftp://www.at91.com/pub/buildroot/
+else ifeq ($(findstring arc,$(GCC_VERSION)),arc)
+ GCC_SITE:=$(BR2_ARC_SITE)
 else
- GCC_SITE:=$(BR2_GNU_MIRROR)/gcc/gcc-$(GCC_VERSION)
+ GCC_SITE:=$(BR2_GNU_MIRROR:/=)/gcc/gcc-$(GCC_VERSION)
 endif
 
 GCC_SOURCE:=gcc-$(GCC_VERSION).tar.bz2
@@ -63,7 +65,11 @@ endif
 
 # Determine soft-float options
 ifeq ($(BR2_SOFT_FLOAT),y)
+# only mips*-*-*, arm*-*-* and sparc*-*-* accept --with-float
+# powerpc seems to be needing it as well
+ifeq ($(BR2_arm)$(BR2_armeb)$(BR2_mips)$(BR2_mipsel)$(BR2_mips64)$(BR2_mips64el)$(BR2_powerpc)$(BR2_sparc),y)
 SOFT_FLOAT_CONFIG_OPTION:=--with-float=soft
+endif
 ifeq ($(BR2_arm)$(BR2_armeb),y) # only set float-abi for arm
 TARGET_SOFT_FLOAT:=-mfloat-abi=soft
 else
@@ -85,7 +91,11 @@ ifneq ($(call qstrip,$(BR2_GCC_TARGET_ABI)),)
 GCC_WITH_ABI:=--with-abi=$(BR2_GCC_TARGET_ABI)
 endif
 ifneq ($(call qstrip,$(BR2_GCC_TARGET_CPU)),)
-GCC_WITH_CPU:=--with-cpu=$(BR2_GCC_TARGET_CPU)
+ifneq ($(call qstrip,$(BR2_GCC_TARGET_CPU_REVISION)),)
+GCC_WITH_CPU:=--with-cpu=$(call qstrip,$(BR2_GCC_TARGET_CPU)-$(BR2_GCC_TARGET_CPU_REVISION))
+else
+GCC_WITH_CPU:=--with-cpu=$(call qstrip,$(BR2_GCC_TARGET_CPU))
+endif
 endif
 
 # AVR32 GCC special configuration
@@ -161,39 +171,7 @@ endif
 GCC_HOST_PREREQ = host-gmp host-mpfr
 GCC_TARGET_PREREQ += mpfr gmp
 
-# GCC 4.5.x prerequisites
-ifeq ($(findstring x4.5.,x$(GCC_VERSION)),x4.5.)
-GCC_WITH_HOST_MPC = --with-mpc=$(HOST_DIR)/usr
-GCC_TARGET_PREREQ += mpc
-ifeq ($(BR2_TOOLCHAIN_BUILDROOT),y)
-HOST_SOURCE += host-mpc-source
-endif
-GCC_HOST_PREREQ += host-mpc
-endif
-
-# GCC 4.6.x prerequisites
-ifeq ($(findstring x4.6.,x$(GCC_VERSION)),x4.6.)
-GCC_WITH_HOST_MPC = --with-mpc=$(HOST_DIR)/usr
-GCC_TARGET_PREREQ += mpc
-ifeq ($(BR2_TOOLCHAIN_BUILDROOT),y)
-HOST_SOURCE += host-mpc-source
-endif
-GCC_HOST_PREREQ += host-mpc
-endif
-
-# GCC 4.7.x prerequisites
-ifeq ($(findstring x4.7.,x$(GCC_VERSION)),x4.7.)
-GCC_WITH_HOST_MPC = --with-mpc=$(HOST_DIR)/usr
-GCC_TARGET_PREREQ += mpc
-ifeq ($(BR2_TOOLCHAIN_BUILDROOT),y)
-HOST_SOURCE += host-mpc-source
-endif
-GCC_HOST_PREREQ += host-mpc
-endif
-
-# GCC snapshot prerequisites
-# Since we don't know and it can be quite new just ask for everything known
-ifneq ($(GCC_SNAP_DATE),)
+ifeq ($(BR2_GCC_NEEDS_MPC),y)
 GCC_WITH_HOST_MPC = --with-mpc=$(HOST_DIR)/usr
 GCC_TARGET_PREREQ += mpc
 ifeq ($(BR2_TOOLCHAIN_BUILDROOT),y)
@@ -243,10 +221,12 @@ endif
 
 $(DL_DIR)/$(GCC_SOURCE):
 	mkdir -p $(DL_DIR)
-	$(call DOWNLOAD,$(GCC_SITE)/$(GCC_SOURCE))
+	$(Q)$(call MESSAGE,"Downloading gcc")
+	$(call DOWNLOAD,$(GCC_SITE:/=)/$(GCC_SOURCE))
 
 gcc-unpacked: $(GCC_DIR)/.patched
 $(GCC_DIR)/.unpacked: $(DL_DIR)/$(GCC_SOURCE)
+	$(Q)$(call MESSAGE,"Extracting gcc")
 	mkdir -p $(TOOLCHAIN_DIR)
 	rm -rf $(GCC_DIR)
 	$(GCC_CAT) $(DL_DIR)/$(GCC_SOURCE) | tar -C $(TOOLCHAIN_DIR) $(TAR_OPTIONS) -
@@ -259,6 +239,7 @@ endif
 
 gcc-patched: $(GCC_DIR)/.patched
 $(GCC_DIR)/.patched: $(GCC_DIR)/.unpacked
+	$(Q)$(call MESSAGE,"Patching gcc")
 	# Apply any files named gcc-*.patch from the source directory to gcc
 ifneq ($(wildcard $(GCC_PATCH_DIR)),)
 	support/scripts/apply-patches.sh $(GCC_DIR) $(GCC_PATCH_DIR) \*.patch
@@ -279,9 +260,11 @@ endif
 GCC_BUILD_DIR1:=$(TOOLCHAIN_DIR)/gcc-$(GCC_VERSION)-initial
 
 $(GCC_BUILD_DIR1)/.configured: $(GCC_DIR)/.patched
+	$(Q)$(call MESSAGE,"Configuring gcc pass-1")
 	mkdir -p $(GCC_BUILD_DIR1)
 	(cd $(GCC_BUILD_DIR1); rm -rf config.cache; \
 		$(HOST_CONFIGURE_OPTS) \
+		MAKEINFO=missing \
 		$(GCC_DIR)/configure $(QUIET) \
 		--prefix=$(HOST_DIR)/usr \
 		--build=$(GNU_HOST_NAME) \
@@ -308,11 +291,13 @@ $(GCC_BUILD_DIR1)/.configured: $(GCC_DIR)/.patched
 		$(GCC_DECIMAL_FLOAT) \
 		$(SOFT_FLOAT_CONFIG_OPTION) \
 		$(GCC_WITH_ABI) $(GCC_WITH_ARCH) $(GCC_WITH_TUNE) $(GCC_WITH_CPU) \
+		$(DISABLE_LARGEFILE) \
 		$(EXTRA_GCC_CONFIG_OPTIONS) \
 	)
 	touch $@
 
 $(GCC_BUILD_DIR1)/.compiled: $(GCC_BUILD_DIR1)/.configured
+	$(Q)$(call MESSAGE,"Building gcc pass-1")
 ifeq ($(BR2_GCC_SUPPORTS_FINEGRAINEDMTUNE),y)
 	$(GCC_CONF_ENV) $(MAKE) -C $(GCC_BUILD_DIR1) all-gcc
 else
@@ -322,6 +307,7 @@ endif
 
 gcc_initial=$(GCC_BUILD_DIR1)/.installed
 $(gcc_initial) $(HOST_DIR)/usr/bin/$(GNU_TARGET_NAME)-gcc: $(GCC_BUILD_DIR1)/.compiled
+	$(Q)$(call MESSAGE,"Installing gcc pass-1")
 	PATH=$(TARGET_PATH) $(MAKE) -C $(GCC_BUILD_DIR1) install-gcc
 	touch $(gcc_initial)
 
@@ -345,9 +331,11 @@ GCC_BUILD_DIR2:=$(TOOLCHAIN_DIR)/gcc-$(GCC_VERSION)-intermediate
 # the step or libgcc will not build...
 
 $(GCC_BUILD_DIR2)/.configured: $(GCC_DIR)/.patched
+	$(Q)$(call MESSAGE,"Configuring gcc pass-2")
 	mkdir -p $(GCC_BUILD_DIR2)
 	(cd $(GCC_BUILD_DIR2); rm -rf config.cache; \
 		$(HOST_CONFIGURE_OPTS) \
+		MAKEINFO=missing \
 		$(GCC_DIR)/configure $(QUIET) \
 		--prefix=$(HOST_DIR)/usr \
 		--build=$(GNU_HOST_NAME) \
@@ -373,11 +361,13 @@ $(GCC_BUILD_DIR2)/.configured: $(GCC_DIR)/.patched
 		$(GCC_DECIMAL_FLOAT) \
 		$(SOFT_FLOAT_CONFIG_OPTION) \
 		$(GCC_WITH_ABI) $(GCC_WITH_ARCH) $(GCC_WITH_TUNE) $(GCC_WITH_CPU) \
+		$(DISABLE_LARGEFILE) \
 		$(EXTRA_GCC_CONFIG_OPTIONS) \
 	)
 	touch $@
 
 $(GCC_BUILD_DIR2)/.compiled: $(GCC_BUILD_DIR2)/.configured
+	$(Q)$(call MESSAGE,"Building gcc pass-2")
 	# gcc >= 4.3.0 have to also build all-target-libgcc
 ifeq ($(BR2_GCC_SUPPORTS_FINEGRAINEDMTUNE),y)
 	$(GCC_CONF_ENV) $(MAKE) -C $(GCC_BUILD_DIR2) all-gcc all-target-libgcc
@@ -388,6 +378,7 @@ endif
 
 gcc_intermediate=$(GCC_BUILD_DIR2)/.installed
 $(gcc_intermediate): $(GCC_BUILD_DIR2)/.compiled
+	$(Q)$(call MESSAGE,"Installing gcc pass-2")
 	# gcc >= 4.3.0 have to also install install-target-libgcc
 ifeq ($(BR2_GCC_SUPPORTS_FINEGRAINEDMTUNE),y)
 	PATH=$(TARGET_PATH) $(MAKE) -C $(GCC_BUILD_DIR2) install-gcc install-target-libgcc
@@ -419,11 +410,13 @@ gcc_intermediate-dirclean:
 
 GCC_BUILD_DIR3:=$(TOOLCHAIN_DIR)/gcc-$(GCC_VERSION)-final
 $(GCC_BUILD_DIR3)/.configured: $(GCC_SRC_DIR)/.patched $(GCC_STAGING_PREREQ)
+	$(Q)$(call MESSAGE,"Configuring gcc final")
 	mkdir -p $(GCC_BUILD_DIR3)
 	# Important! Required for limits.h to be fixed.
 	ln -snf ../include/ $(HOST_DIR)/usr/$(GNU_TARGET_NAME)/sys-include
 	(cd $(GCC_BUILD_DIR3); rm -rf config.cache; \
 		$(HOST_CONFIGURE_OPTS) \
+		MAKEINFO=missing \
 		$(GCC_SRC_DIR)/configure $(QUIET) \
 		--prefix=$(HOST_DIR)/usr \
 		--build=$(GNU_HOST_NAME) \
@@ -455,10 +448,12 @@ $(GCC_BUILD_DIR3)/.configured: $(GCC_SRC_DIR)/.patched $(GCC_STAGING_PREREQ)
 	touch $@
 
 $(GCC_BUILD_DIR3)/.compiled: $(GCC_BUILD_DIR3)/.configured
+	$(Q)$(call MESSAGE,"Building gcc final")
 	$(GCC_CONF_ENV) $(MAKE) -C $(GCC_BUILD_DIR3) all
 	touch $@
 
 $(GCC_BUILD_DIR3)/.installed: $(GCC_BUILD_DIR3)/.compiled
+	$(Q)$(call MESSAGE,"Installing gcc final")
 	PATH=$(TARGET_PATH) $(MAKE) \
 		-C $(GCC_BUILD_DIR3) install
 	if [ -d "$(STAGING_DIR)/lib64" ]; then \
@@ -490,6 +485,7 @@ endif
 	touch $@
 
 $(STAMP_DIR)/gcc_libs_target_installed: $(GCC_BUILD_DIR3)/.installed
+	$(Q)$(call MESSAGE,"Installing gcc final libraries to staging and target")
 ifeq ($(BR2_GCC_SHARED_LIBGCC),y)
 	# These go in /lib, so...
 	rm -rf $(TARGET_DIR)/usr/lib/libgcc_s*.so*
@@ -546,6 +542,7 @@ $(GCC_BUILD_DIR4)/.prepared: $(STAMP_DIR)/gcc_libs_target_installed
 	touch $@
 
 $(GCC_BUILD_DIR4)/.configured: $(GCC_BUILD_DIR4)/.prepared
+	$(Q)$(call MESSAGE,"Configuring gcc on target")
 	(cd $(GCC_BUILD_DIR4); rm -rf config.cache; \
 		$(TARGET_CONFIGURE_OPTS) \
 		$(TARGET_CONFIGURE_ARGS) \
@@ -584,6 +581,7 @@ $(GCC_BUILD_DIR4)/.configured: $(GCC_BUILD_DIR4)/.prepared
 	touch $@
 
 $(GCC_BUILD_DIR4)/.compiled: $(GCC_BUILD_DIR4)/.configured
+	$(Q)$(call MESSAGE,"Building gcc on target")
 	PATH=$(TARGET_PATH) \
 	$(MAKE) -C $(GCC_BUILD_DIR4) all
 	touch $@
@@ -596,6 +594,7 @@ GCC_INCLUDE_DIR:=include-fixed
 endif
 
 $(TARGET_DIR)/usr/bin/gcc: $(GCC_BUILD_DIR4)/.compiled
+	$(Q)$(call MESSAGE,"Installing gcc on target")
 	PATH=$(TARGET_PATH) DESTDIR=$(TARGET_DIR) \
 		$(MAKE1) -C $(GCC_BUILD_DIR4) install
 	# Remove broken specs file (cross compile flag is set).
