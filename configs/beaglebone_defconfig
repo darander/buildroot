@@ -13,7 +13,6 @@ BR2_TARGET_GENERIC_GETTY_PORT="ttyO0"
 # filesystem
 BR2_PACKAGE_AM33X_CM3=y
 BR2_TARGET_ROOTFS_EXT2=y
-# BR2_TARGET_ROOTFS_TAR is not set
 
 # lock down headers to avoid breaking with new defaults
 BR2_KERNEL_HEADERS_VERSION=y
