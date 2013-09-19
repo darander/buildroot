@@ -1,8 +1,8 @@
-#############################################################
+################################################################################
 #
-# Aircrack-ng
+# aircrack-ng
 #
-#############################################################
+################################################################################
 
 AIRCRACK_NG_VERSION = 1.1
 AIRCRACK_NG_SOURCE = aircrack-ng-$(AIRCRACK_NG_VERSION).tar.gz
@@ -13,16 +13,20 @@ AIRCRACK_NG_DEPENDENCIES = openssl
 
 ifeq ($(BR2_PACKAGE_SQLITE),y)
 	AIRCRACK_NG_MAKE_OPTS = sqlite=true
-	AIRCRACK_NG_MAKE_OPTS += LIBSQL="-lsqlite3"
+	AIRCRACK_NG_MAKE_OPTS += \
+		LIBSQL="-lsqlite3$(if $(BR2_PREFER_STATIC_LIB), -ldl -lpthread)"
 
 	AIRCRACK_NG_DEPENDENCIES += sqlite
 else
 	AIRCRACK_NG_MAKE_OPTS = sqlite=false
 endif
 
+AIRCRACK_NG_LDFLAGS = $(TARGET_LDFLAGS) -lz \
+	$(if $(BR2_PREFER_STATIC_LIB),-ldl -lpthread)
+
 define AIRCRACK_NG_BUILD_CMDS
 	$(TARGET_CONFIGURE_OPTS) $(MAKE1) CC="$(TARGET_CC)" LD="$(TARGET_LD)" \
-		LDFLAGS="$(TARGET_LDFLAGS) -lz" \
+		LDFLAGS="$(AIRCRACK_NG_LDFLAGS)" \
 		-C $(@D) $(AIRCRACK_NG_MAKE_OPTS) all
 endef
 

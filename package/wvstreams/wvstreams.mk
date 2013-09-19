@@ -1,12 +1,12 @@
-#############################################################
+################################################################################
 #
 # wvstreams
 #
-#############################################################
+################################################################################
 
 WVSTREAMS_VERSION = 4.6.1
 WVSTREAMS_SITE = http://wvstreams.googlecode.com/files
-WVSTREAMS_DEPENDENCIES = openssl zlib
+WVSTREAMS_DEPENDENCIES = openssl zlib host-pkgconf
 WVSTREAMS_INSTALL_STAGING = YES
 
 WVSTREAMS_LICENSE = LGPLv2+
@@ -18,7 +18,18 @@ WVSTREAMS_MAKE = $(MAKE1)
 # Needed to work around problem with wvassert.h
 WVSTREAMS_CONF_OPT += CPPFLAGS=-DNDEBUG
 
-WVSTREAMS_CONF_OPT += --with-openssl --with-zlib --without-pam
+WVSTREAMS_CONF_OPT += \
+	--with-openssl \
+	--with-zlib \
+	--without-pam \
+	--disable-warnings
+
+# needed for openssl detection when statically linking (as ssl needs lz)
+WVSTREAMS_CONF_ENV += LIBS=-lz
+
+ifneq ($(BR2_PREFER_STATIC_LIB),y)
+	WVSTREAMS_CONF_ENV += CFLAGS="$(TARGET_CFLAGS) -fPIC"
+endif
 
 ifeq ($(BR2_PACKAGE_DBUS),y)
 	WVSTREAMS_DEPENDENCIES += dbus

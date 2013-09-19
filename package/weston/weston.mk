@@ -1,8 +1,8 @@
-#############################################################
+################################################################################
 #
 # weston
 #
-#############################################################
+################################################################################
 
 WESTON_VERSION = 1.1.0
 WESTON_SITE = http://wayland.freedesktop.org/releases/
@@ -10,7 +10,8 @@ WESTON_SOURCE = weston-$(WAYLAND_VERSION).tar.xz
 WESTON_LICENSE = MIT
 WESTON_LICENSE_FILES = COPYING
 
-WESTON_DEPENDENCIES = wayland libxkbcommon pixman libpng jpeg mtdev udev
+WESTON_DEPENDENCIES = wayland libxkbcommon pixman libpng \
+	jpeg mtdev udev cairo
 WESTON_CONF_OPT = \
 	--disable-egl \
 	--disable-xwayland \

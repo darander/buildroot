@@ -1,8 +1,8 @@
-#############################################################
+################################################################################
 #
-# QUOTA
+# quota
 #
-#############################################################
+################################################################################
 
 QUOTA_VERSION = 4.00
 QUOTA_SOURCE = quota-$(QUOTA_VERSION).tar.gz
@@ -14,7 +14,7 @@ QUOTA_CFLAGS = $(TARGET_CFLAGS)
 QUOTA_LDFLAGS = $(TARGET_LDFLAGS)
 
 ifeq ($(BR2_NEEDS_GETTEXT_IF_LOCALE),y)
-QUOTA_DEPENDENCIES = gettext
+QUOTA_DEPENDENCIES += gettext
 QUOTA_LDFLAGS += -lintl
 endif
 
