@@ -23,6 +23,14 @@ UPPERCASE = $(strip $(eval __tmp := $1) \
 	$(__tmp)))) \
 	$(__tmp))
 
+# LOWERCASE macro -- transforms its arguments to lowercase
+# The above non-tr implementation is not needed, because LOWERCASE is not
+# called very often
+
+define LOWERCASE
+$(shell echo $1 | tr '[:upper:]' '[:lower:]')
+endef
+
 #
 # Manipulation of .config files based on the Kconfig
 # infrastructure. Used by the Busybox package, the Linux kernel
@@ -62,6 +70,8 @@ INFLATE.tbz2 = $(BZCAT)
 INFLATE.tgz  = $(ZCAT)
 INFLATE.xz   = $(XZCAT)
 INFLATE.tar  = cat
+# suitable-extractor(filename): returns extractor based on suffix
+suitable-extractor = $(INFLATE$(suffix $(1)))
 
 # MESSAGE Macro -- display a message in bold type
 MESSAGE     = echo "$(TERM_BOLD)>>> $($(PKG)_NAME) $($(PKG)_VERSION) $(1)$(TERM_RESET)"

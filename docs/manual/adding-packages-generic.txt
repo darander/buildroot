@@ -62,8 +62,8 @@ system is based on hand-written Makefiles or shell scripts.
 
 The Makefile begins on line 7 to 11 with metadata information: the
 version of the package (+LIBFOO_VERSION+), the name of the
-tarball containing the package (+LIBFOO_SOURCE+) the
-Internet location at which the tarball can be downloaded from
+tarball containing the package (+LIBFOO_SOURCE+) (xz-ed tarball recommended)
+the Internet location at which the tarball can be downloaded from
 (+LIBFOO_SITE+), the license (+LIBFOO_LICENSE+) and file with the
 license text (+LIBFOO_LICENSE_FILES+). All variables must start with
 the same prefix, +LIBFOO_+ in this case. This prefix is always the
@@ -248,6 +248,12 @@ information is (assuming the package name is +libfoo+) :
     +LIBFOO_SITE=/opt/software/libfoo.tar.gz+ +
     +LIBFOO_SITE=$(TOPDIR)/../src/libfoo/+
 
+* +LIBFOO_EXTRA_DOWNLOADS+ lists a number of additional files that
+  Buildroot should download from +LIBFOO_SITE+ in addition to the main
+  +LIBFOO_SOURCE+ (which usually is a tarball). Buildroot will not do
+  anything with those additional files, except download files: it will
+  be up to the package recipe to use them from +$(DL_DIR)+.
+
 * +LIBFOO_SITE_METHOD+ determines the method used to fetch or copy the
   package source code. In many cases, Buildroot guesses the method
   from the contents of +LIBFOO_SITE+ and setting +LIBFOO_SITE_METHOD+
@@ -266,6 +272,13 @@ information is (assuming the package name is +libfoo+) :
      Buildroot performs a checkout which is preserved as a tarball in
      the download cache; subsequent builds use the tarball instead of
      performing another checkout.
+  ** +cvs+ for retrieving source code from a CVS repository.
+     Used by default when +LIBFOO_SITE+ begins with +cvs://+.
+     The downloaded source code is cached as with the +svn+ method.
+     Only anonymous pserver mode is supported.
+     +LIBFOO_SITE+ 'must' contain the source URL as well as the remote
+     repository directory. The module is the package name.
+     +LIBFOO_VERSION+ is 'mandatory' and 'must' be a timestamp.
   ** +git+ for retrieving source code from a Git repository.  Used by
      default when +LIBFOO_SITE+ begins with +git://+. The downloaded
      source code is cached as with the +svn+
@@ -438,41 +451,4 @@ In the action definitions, you can use the following variables:
 * Of course the +$(HOST_DIR)+, +$(STAGING_DIR)+ and +$(TARGET_DIR)+
   variables to install the packages properly.
 
-The last feature of the generic infrastructure is the ability to add
-hooks. These define further actions to perform after existing steps.
-Most hooks aren't really useful for generic packages, since the +.mk+
-file already has full control over the actions performed in each step
-of the package construction. The hooks are more useful for packages
-using the autotools infrastructure described below.  However, since
-they are provided by the generic infrastructure, they are documented
-here. The exception is +LIBFOO_POST_PATCH_HOOKS+.  Patching the
-package and producing legal info are not user definable, so
-+LIBFOO_POST_PATCH_HOOKS+ and +LIBFOO_POST_LEGAL_INFO_HOOKS+ are
-useful for generic packages.
-
-The following hook points are available:
-
-* +LIBFOO_POST_DOWNLOAD_HOOKS+
-* +LIBFOO_POST_EXTRACT_HOOKS+
-* +LIBFOO_PRE_PATCH_HOOKS+
-* +LIBFOO_POST_PATCH_HOOKS+
-* +LIBFOO_PRE_CONFIGURE_HOOKS+
-* +LIBFOO_POST_CONFIGURE_HOOKS+
-* +LIBFOO_POST_BUILD_HOOKS+
-* +LIBFOO_POST_INSTALL_HOOKS+ (for host packages only)
-* +LIBFOO_POST_INSTALL_STAGING_HOOKS+ (for target packages only)
-* +LIBFOO_POST_INSTALL_TARGET_HOOKS+ (for target packages only)
-* +LIBFOO_POST_LEGAL_INFO_HOOKS+
-
-These variables are 'lists' of variable names containing actions to be
-performed at this hook point. This allows several hooks to be
-registered at a given hook point. Here is an example:
-
-----------------------
-define LIBFOO_POST_PATCH_FIXUP
-	action1
-	action2
-endef
-
-LIBFOO_POST_PATCH_HOOKS += LIBFOO_POST_PATCH_FIXUP
-----------------------
+Finally, you can also use hooks. See xref:hooks[] for more information.

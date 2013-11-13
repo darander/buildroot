@@ -4,14 +4,16 @@
 #
 ################################################################################
 
-CJSON_VERSION         = 42
+CJSON_VERSION         = 58
 CJSON_SITE_METHOD     = svn
-CJSON_SITE            = https://cjson.svn.sourceforge.net/svnroot/cjson
+CJSON_SITE            = http://svn.code.sf.net/p/cjson/code
 CJSON_INSTALL_STAGING = YES
 CJSON_LICENSE         = MIT
+CJSON_LICENSE_FILES   = LICENSE
 
 define CJSON_BUILD_CMDS
-	cd $(@D) && $(TARGET_CC) $(TARGET_CFLAGS) -shared -fPIC cJSON.c -o libcJSON.so
+	cd $(@D) && $(TARGET_CC) $(TARGET_CFLAGS) -shared -fPIC -lm \
+		cJSON.c -o libcJSON.so
 endef
 
 define CJSON_INSTALL_STAGING_CMDS
