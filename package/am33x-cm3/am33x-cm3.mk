@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-AM33X_CM3_VERSION = AM335xPSP_04.06.00.10-rc1
+AM33X_CM3_VERSION = v05.00.00.01
 AM33X_CM3_SITE = http://arago-project.org/git/projects/am33x-cm3.git
 AM33X_CM3_SITE_METHOD = git
 AM33X_CM3_LICENSE = TI Publicly Available Software License
