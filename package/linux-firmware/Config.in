@@ -26,9 +26,10 @@ config BR2_PACKAGE_LINUX_FIRMWARE_ATHEROS_9271
 	  Firmware files for the Atheros 9271 module
 
 config BR2_PACKAGE_LINUX_FIRMWARE_BRCM_BCM43XX
-	bool "Broadcom BRCM bcm43xx"
+	bool "Broadcom BRCM bcm43xx/43xxx"
 	help
-	  Firmware files for the Broadcom BRCM bcm43xx
+	  Firmware files for the Broadcom bcm43xx and bcm43xxx,
+	  SoftMAC and FullMAC.
 
 config BR2_PACKAGE_LINUX_FIRMWARE_IWLWIFI_3160
 	bool "Intel iwlwifi 3160"
@@ -47,6 +48,34 @@ config BR2_PACKAGE_LINUX_FIRMWARE_IWLWIFI_7260
 	help
 	  Firmware files for the Intel Wifi 7260 devices supported by
 	  the iwlwifi kernel driver.
+
+if BR2_PACKAGE_LINUX_FIRMWARE_IWLWIFI_3160 || \
+   BR2_PACKAGE_LINUX_FIRMWARE_IWLWIFI_7260
+
+choice
+	bool "iwlwifi 3160/7260 revision to use"
+	help
+	  Use revision 7 for kernel 3.10 to 3.12.
+	  Use revision 8 for kernel 3.13 onward.
+
+config BR2_PACKAGE_LINUX_FIRMWARE_IWLWIFI_3160_7260_7
+	prompt "revision 7"
+	help
+	  Use revision 7 for kernel 3.10 to 3.12.
+
+config BR2_PACKAGE_LINUX_FIRMWARE_IWLWIFI_3160_7260_8
+	prompt "revision 8"
+	help
+	  Use revision 8 for kernel 3.13 onward.
+
+endchoice
+
+config BR2_PACKAGE_LINUX_FIRMWARE_IWLWIFI_3160_7260_REV
+	int
+	default 7 if BR2_PACKAGE_LINUX_FIRMWARE_IWLWIFI_3160_7260_7
+	default 8 if BR2_PACKAGE_LINUX_FIRMWARE_IWLWIFI_3160_7260_8
+
+endif # iwlwifi 3160/7260
 
 config BR2_PACKAGE_LINUX_FIRMWARE_LIBERTAS_SD8686_V8
 	bool "Libertas SD 8686 v8"

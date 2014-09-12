@@ -1,9 +1,8 @@
 // -*- mode:doc; -*-
 // vim: set syntax=asciidoc:
 
-[[customize-store]]
-Storing the configuration
--------------------------
+[[customize-store-basics]]
+=== Basics for storing the configuration
 
 When you have a buildroot configuration that you are satisfied with and
 you want to share it with others, put it under revision control or move
@@ -13,15 +12,8 @@ consists of the buildroot configuration, the configuration files for
 packages that you use (kernel, busybox, uClibc, ...), and your rootfs
 modifications.
 
-
-[[customize-store-basics]]
-Basics for storing the configuration
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
 [[customize-store-buildroot-config]]
-Buildroot configuration
-^^^^^^^^^^^^^^^^^^^^^^^
+==== Buildroot configuration
 
 For storing the buildroot configuration itself, buildroot offers the
 following command: +make savedefconfig+.
@@ -39,8 +31,7 @@ Alternatively, you can copy the file to any other place and rebuild with
 
 
 [[customize-store-package-config]]
-Other package configuration
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+==== Other package configuration
 
 The configuration files for busybox, the linux kernel, barebox and
 uClibc should be stored as well if changed. For each of these, a
@@ -76,8 +67,7 @@ configuration files easier.
 
 
 [[customize-store-board-support]]
-Creating your own board support
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=== Creating your own board support
 
 Creating your own board support in Buildroot allows users of a
 particular hardware platform to easily build a system that is known to
@@ -85,9 +75,9 @@ work.
 
 To do so, you need to create a normal Buildroot configuration that
 builds a basic system for the hardware: toolchain, kernel, bootloader,
-filesystem and a simple Busybox-only userspace. No specific package
+filesystem and a simple BusyBox-only userspace. No specific package
 should be selected: the configuration should be as minimal as
-possible, and should only build a working basic Busybox system for the
+possible, and should only build a working basic BusyBox system for the
 target platform. You can of course use more complicated configurations
 for your internal projects, but the Buildroot project will only
 integrate basic board configurations. This is because package
@@ -112,8 +102,7 @@ and configurations in these directories, and reference them from the main
 Buildroot configuration.
 
 
-Step-by-step instructions for storing configuration
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+=== Step-by-step instructions for storing configuration
 
 To store the configuration for a specific product, device or
 application, it is advisable to use the same conventions as for the

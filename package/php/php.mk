@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-PHP_VERSION = 5.5.8
+PHP_VERSION = 5.5.16
 PHP_SITE = http://www.php.net/distributions
 PHP_INSTALL_STAGING = YES
 PHP_INSTALL_STAGING_OPT = INSTALL_ROOT=$(STAGING_DIR) install
@@ -19,14 +19,24 @@ PHP_CONF_OPT =  --mandir=/usr/share/man \
 		--with-config-file-path=/etc \
 		--localstatedir=/var \
 		--disable-rpath
+PHP_CONF_ENV = EXTRA_LIBS="$(PHP_EXTRA_LIBS)"
+
 ifeq ($(BR2_ENDIAN),"BIG")
-PHP_CONF_ENV = ac_cv_c_bigendian_php=yes
+PHP_CONF_ENV += ac_cv_c_bigendian_php=yes
 else
-PHP_CONF_ENV = ac_cv_c_bigendian_php=no
+PHP_CONF_ENV += ac_cv_c_bigendian_php=no
 endif
 PHP_CONFIG_SCRIPTS = php-config
 
 PHP_CFLAGS = $(TARGET_CFLAGS)
+
+# We need to force dl "detection"
+ifeq ($(BR2_PREFER_STATIC_LIB),)
+PHP_CONF_ENV += ac_cv_func_dlopen=yes ac_cv_lib_dl_dlopen=yes
+PHP_EXTRA_LIBS += -ldl
+else
+PHP_CONF_ENV += ac_cv_func_dlopen=no ac_cv_lib_dl_dlopen=no
+endif
 
 # Workaround for non-IPv6 uClibc toolchain
 ifeq ($(BR2_TOOLCHAIN_USES_UCLIBC),y)
@@ -35,12 +45,9 @@ ifneq ($(BR2_INET_IPV6),y)
 endif
 endif
 
-ifeq ($(BR2_xtensa),y)
-PHP_CFLAGS += -mtext-section-literals
-endif
-
 PHP_CONF_OPT += $(if $(BR2_PACKAGE_PHP_CLI),,--disable-cli)
 PHP_CONF_OPT += $(if $(BR2_PACKAGE_PHP_CGI),,--disable-cgi)
+PHP_CONF_OPT += $(if $(BR2_PACKAGE_PHP_FPM),--enable-fpm,--disable-fpm)
 
 ### Extensions
 PHP_CONF_OPT += $(if $(BR2_PACKAGE_PHP_EXT_SOCKETS),--enable-sockets) \
@@ -67,7 +74,8 @@ PHP_CONF_OPT += $(if $(BR2_PACKAGE_PHP_EXT_SOCKETS),--enable-sockets) \
 		$(if $(BR2_PACKAGE_PHP_EXT_FILTER),--enable-filter) \
 		$(if $(BR2_PACKAGE_PHP_EXT_CALENDAR),--enable-calendar) \
 		$(if $(BR2_PACKAGE_PHP_EXT_FILEINFO),--enable-fileinfo) \
-		$(if $(BR2_PACKAGE_PHP_EXT_BCMATH),--enable-bcmath)
+		$(if $(BR2_PACKAGE_PHP_EXT_BCMATH),--enable-bcmath) \
+		$(if $(BR2_PACKAGE_PHP_EXT_PHAR),--enable-phar)
 
 ifeq ($(BR2_PACKAGE_PHP_EXT_OPENSSL),y)
 	PHP_CONF_OPT += --with-openssl=$(STAGING_DIR)/usr
@@ -116,7 +124,7 @@ ifeq ($(BR2_PACKAGE_PHP_EXT_INTL),y)
 	# The intl module is implemented in C++, but PHP fails to use
 	# g++ as the compiler for the final link. As a workaround,
 	# tell it to link libstdc++.
-	PHP_CONF_ENV += EXTRA_LIBS="-lstdc++"
+	PHP_EXTRA_LIBS += -lstdc++
 endif
 
 ifeq ($(BR2_PACKAGE_PHP_EXT_GMP),y)
@@ -199,6 +207,15 @@ ifeq ($(BR2_PACKAGE_PHP_EXT_SNMP),y)
 	PHP_CONF_OPT += --with-snmp=$(STAGING_DIR)/usr
 	PHP_DEPENDENCIES += netsnmp
 endif
+
+define PHP_EXTENSIONS_FIXUP
+	$(SED) "/prefix/ s:/usr:$(STAGING_DIR)/usr:" \
+		$(STAGING_DIR)/usr/bin/phpize
+	$(SED) "/extension_dir/ s:/usr:$(TARGET_DIR)/usr:" \
+		$(STAGING_DIR)/usr/bin/php-config
+endef
+
+PHP_POST_INSTALL_TARGET_HOOKS += PHP_EXTENSIONS_FIXUP
 
 define PHP_INSTALL_FIXUP
 	rm -rf $(TARGET_DIR)/usr/lib/php

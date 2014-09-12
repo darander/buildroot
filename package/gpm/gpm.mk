@@ -1,12 +1,12 @@
-###############################################################################
+################################################################################
 #
 # gpm
 #
-###############################################################################
+################################################################################
 
 GPM_VERSION = 1.20.7
 GPM_SOURCE = gpm-$(GPM_VERSION).tar.bz2
-GPM_SITE = http://www.nico.schottelius.org/software/gpm/archives/
+GPM_SITE = http://www.nico.schottelius.org/software/gpm/archives
 GPM_LICENSE = GPLv2+
 GPM_LICENSE_FILES = COPYING
 GPM_INSTALL_STAGING = YES
@@ -16,6 +16,14 @@ GPM_DEPENDENCIES = host-bison
 # of the headers needed to generate build dependencies, the first time it is
 # built. CPPFLAGS is used to pass the right include path to dependency rules.
 GPM_CONF_ENV = CPPFLAGS="$(TARGET_CPPFLAGS) -I$(@D)/src/headers/"
+
+# For some reason, Microblaze gcc does not define __ELF__, which gpm
+# configure script uses to determine whether the architecture uses ELF
+# binaries and therefore can build shared libraries. We fix this by
+# telling GPM that ELF is used on Microblaze.
+ifeq ($(BR2_microblaze),y)
+GPM_CONF_ENV += itz_cv_sys_elf=yes
+endif
 
 # gpm and ncurses have a circular dependency. As gpm function GPM_Wgetch()
 # (requiring ncurses) is not recommended for use by ncurses people themselves
@@ -27,7 +35,7 @@ GPM_CONF_OPT = --without-curses
 # configure is missing but gpm seems not compatible with our autoreconf
 # mechanism so we have to do it manually instead of using GPM_AUTORECONF = YES
 define GPM_RUN_AUTOGEN
-	cd $(@D) && PATH=$(HOST_PATH) ./autogen.sh
+	cd $(@D) && PATH=$(BR_PATH) ./autogen.sh
 endef
 GPM_PRE_CONFIGURE_HOOKS += GPM_RUN_AUTOGEN
 

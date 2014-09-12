@@ -4,14 +4,12 @@
 #
 ################################################################################
 
-XSERVER_XORG_SERVER_VERSION = 1.12.4
+XSERVER_XORG_SERVER_VERSION = 1.16.0
 XSERVER_XORG_SERVER_SOURCE = xorg-server-$(XSERVER_XORG_SERVER_VERSION).tar.bz2
 XSERVER_XORG_SERVER_SITE = http://xorg.freedesktop.org/releases/individual/xserver
 XSERVER_XORG_SERVER_LICENSE = MIT
 XSERVER_XORG_SERVER_LICENSE_FILES = COPYING
-XSERVER_XORG_SERVER_MAKE = $(MAKE1) # make install fails with parallel make
 XSERVER_XORG_SERVER_INSTALL_STAGING = YES
-XSERVER_XORG_SERVER_INSTALL_STAGING_OPT = DESTDIR=$(STAGING_DIR) install install-data
 XSERVER_XORG_SERVER_DEPENDENCIES = 	\
 	xutil_util-macros 		\
 	xlib_libXfont 			\
@@ -40,6 +38,7 @@ XSERVER_XORG_SERVER_DEPENDENCIES = 	\
 	xproto_glproto 			\
 	xproto_inputproto 		\
 	xproto_kbproto 			\
+	xproto_presentproto 		\
 	xproto_randrproto 		\
 	xproto_renderproto 		\
 	xproto_resourceproto 		\
@@ -59,7 +58,7 @@ XSERVER_XORG_SERVER_CONF_OPT = --disable-config-hal \
 		--disable-xnest --disable-xephyr --disable-dmx \
 		--with-builder-addr=buildroot@buildroot.org \
 		CFLAGS="$(TARGET_CFLAGS) -I$(STAGING_DIR)/usr/include/pixman-1" \
-		--with-fontdir=/usr/share/fonts/X11/ --localstatedir=/var \
+		--with-fontrootdir=/usr/share/fonts/X11/ --localstatedir=/var \
 		--$(if $(BR2_PACKAGE_XSERVER_XORG_SERVER_XVFB),en,dis)able-xvfb
 
 ifeq ($(BR2_PACKAGE_XSERVER_XORG_SERVER_MODULAR),y)
@@ -99,10 +98,11 @@ else # modular
 XSERVER_XORG_SERVER_CONF_OPT += --disable-kdrive --disable-xfbdev
 endif
 
-ifeq ($(BR2_PACKAGE_MESA3D),y)
+ifeq ($(BR2_PACKAGE_MESA3D_DRI_DRIVER),y)
+XSERVER_XORG_SERVER_CONF_OPT += --enable-dri --enable-glx
 XSERVER_XORG_SERVER_DEPENDENCIES += mesa3d xproto_xf86driproto
 else
-XSERVER_XORG_SERVER_CONF_OPT += --disable-dri
+XSERVER_XORG_SERVER_CONF_OPT += --disable-dri --disable-glx
 endif
 
 ifeq ($(BR2_PACKAGE_XSERVER_XORG_SERVER_NULL_CURSOR),y)
@@ -123,9 +123,16 @@ XSERVER_XORG_SERVER_DEPENDENCIES += tslib
 XSERVER_XORG_SERVER_CONF_OPT += --enable-tslib LDFLAGS="-lts"
 endif
 
-ifeq ($(BR2_PACKAGE_UDEV),y)
+ifeq ($(BR2_PACKAGE_HAS_UDEV),y)
 XSERVER_XORG_SERVER_DEPENDENCIES += udev
 XSERVER_XORG_SERVER_CONF_OPT += --enable-config-udev
+# udev kms support depends on libdrm
+ifeq ($(BR2_PACKAGE_LIBDRM),y)
+XSERVER_XORG_SERVER_DEPENDENCIES += libdrm
+XSERVER_XORG_SERVER_CONF_OPT += --enable-config-udev-kms
+else
+XSERVER_XORG_SERVER_CONF_OPT += --disable-config-udev-kms
+endif
 else
 ifeq ($(BR2_PACKAGE_DBUS),y)
 XSERVER_XORG_SERVER_DEPENDENCIES += dbus
@@ -135,6 +142,12 @@ endif
 
 ifeq ($(BR2_PACKAGE_FREETYPE),y)
 XSERVER_XORG_SERVER_DEPENDENCIES += freetype
+endif
+
+ifeq ($(BR2_PACKAGE_LIBUNWIND),y)
+XSERVER_XORG_SERVER_DEPENDENCIES += libunwind
+else
+XSERVER_XORG_SERVER_CONF_OPT += --disable-libunwind
 endif
 
 ifeq ($(BR2_PACKAGE_XPROTO_RECORDPROTO),y)
@@ -157,8 +170,12 @@ ifeq ($(BR2_PACKAGE_XPROTO_DRI2PROTO),y)
 XSERVER_XORG_SERVER_DEPENDENCIES += xproto_dri2proto
 XSERVER_XORG_SERVER_CONF_OPT += --enable-dri2
 endif
+ifeq ($(BR2_PACKAGE_XPROTO_DRI3PROTO),y)
+XSERVER_XORG_SERVER_DEPENDENCIES += xlib_libxshmfence xproto_dri3proto
+XSERVER_XORG_SERVER_CONF_OPT += --enable-dri3
+endif
 else
-XSERVER_XORG_SERVER_CONF_OPT += --disable-dri2
+XSERVER_XORG_SERVER_CONF_OPT += --disable-dri2 --disable-dri3
 endif
 
 ifeq ($(BR2_PACKAGE_XLIB_LIBXSCRNSAVER),y)
@@ -170,12 +187,6 @@ endif
 
 ifneq ($(BR2_PACKAGE_XLIB_LIBDMX),y)
 XSERVER_XORG_SERVER_CONF_OPT += --disable-dmx
-endif
-
-ifeq ($(BR2_PACKAGE_MESA3D),y)
-XSERVER_XORG_SERVER_CONF_OPT += --enable-glx
-else
-XSERVER_XORG_SERVER_CONF_OPT += --disable-glx
 endif
 
 ifeq ($(BR2_PACKAGE_OPENSSL),y)

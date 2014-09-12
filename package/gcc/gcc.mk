@@ -16,14 +16,11 @@ GCC_SNAP_DATE = $(call qstrip,$(BR2_GCC_SNAP_DATE))
 endif
 
 ifneq ($(GCC_SNAP_DATE),)
-GCC_SITE = ftp://gcc.gnu.org/pub/gcc/snapshots/$(GCC_SNAP_DATE)/
+GCC_SITE = ftp://gcc.gnu.org/pub/gcc/snapshots/$(GCC_SNAP_DATE)
 else ifeq ($(findstring avr32,$(GCC_VERSION)),avr32)
-GCC_SITE = ftp://www.at91.com/pub/buildroot/
+GCC_SITE = ftp://www.at91.com/pub/buildroot
 else ifeq ($(BR2_arc),y)
 GCC_SITE = $(call github,foss-for-synopsys-dwc-arc-processors,gcc,$(GCC_VERSION))
-GCC_SOURCE = gcc-$(GCC_VERSION).tar.gz
-else ifeq ($(BR2_microblaze),y)
-GCC_SITE = $(call github,Xilinx,gcc,$(GCC_VERSION))
 GCC_SOURCE = gcc-$(GCC_VERSION).tar.gz
 else
 GCC_SITE = $(BR2_GNU_MIRROR:/=)/gcc/gcc-$(GCC_VERSION)
@@ -125,6 +122,12 @@ ifneq ($(BR2_TOOLCHAIN_BUILDROOT_WCHAR),y)
 HOST_GCC_COMMON_CONF_OPT += --disable-libquadmath
 endif
 
+# libsanitizer requires wordexp, not in default uClibc config. Also
+# doesn't build properly with musl.
+ifeq ($(BR2_TOOLCHAIN_BUILDROOT_UCLIBC)$(BR2_TOOLCHAIN_BUILDROOT_MUSL),y)
+HOST_GCC_COMMON_CONF_OPT += --disable-libsanitizer
+endif
+
 ifeq ($(BR2_GCC_ENABLE_TLS),y)
 HOST_GCC_COMMON_CONF_OPT += --enable-tls
 else
@@ -151,7 +154,14 @@ HOST_GCC_COMMON_DEPENDENCIES += host-mpc
 HOST_GCC_COMMON_CONF_OPT += --with-mpc=$(HOST_DIR)/usr
 endif
 
-ifeq ($(BR2_arc),y)
+ifeq ($(BR2_GCC_ENABLE_GRAPHITE),y)
+HOST_GCC_COMMON_DEPENDENCIES += host-isl host-cloog
+HOST_GCC_COMMON_CONF_OPT += --with-isl=$(HOST_DIR)/usr --with-cloog=$(HOST_DIR)/usr
+else
+HOST_GCC_COMMON_CONF_OPT += --without-isl --without-cloog
+endif
+
+ifneq ($(BR2_arc)$(BR2_GCC_VERSION_SNAP),)
 HOST_GCC_COMMON_DEPENDENCIES += host-flex host-bison
 endif
 

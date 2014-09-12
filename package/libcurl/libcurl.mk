@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-LIBCURL_VERSION = 7.35.0
+LIBCURL_VERSION = 7.37.1
 LIBCURL_SOURCE = curl-$(LIBCURL_VERSION).tar.bz2
 LIBCURL_SITE = http://curl.haxx.se/download
 LIBCURL_DEPENDENCIES = host-pkgconf \
@@ -14,6 +14,8 @@ LIBCURL_DEPENDENCIES = host-pkgconf \
 LIBCURL_LICENSE = ICS
 LIBCURL_LICENSE_FILES = COPYING
 LIBCURL_INSTALL_STAGING = YES
+# For libcurl-0001-build-link-curl-to-NSS-libraries-when-NSS-support.patch
+LIBCURL_AUTORECONF = YES
 
 # We disable NTLM support because it uses fork(), which doesn't work
 # on non-MMU platforms. Moreover, this authentication method is
@@ -36,14 +38,12 @@ LIBCURL_CONF_OPT += --with-ssl=$(STAGING_DIR)/usr \
 else ifeq ($(BR2_PACKAGE_GNUTLS),y)
 LIBCURL_CONF_OPT += --with-gnutls=$(STAGING_DIR)/usr
 LIBCURL_DEPENDENCIES += gnutls
-else ifeq ($(BR2_PACKAGE_POLARSSL),y)
-LIBCURL_CONF_OPT += --with-polarssl=$(STAGING_DIR)/usr
-LIBCURL_DEPENDENCIES += polarssl
 else ifeq ($(BR2_PACKAGE_LIBNSS),y)
 LIBCURL_CONF_OPT += --with-nss=$(STAGING_DIR)/usr
 LIBCURL_CONF_ENV += CPPFLAGS="$(TARGET_CPPFLAGS) `$(PKG_CONFIG_HOST_BINARY) nspr nss --cflags`"
 LIBCURL_DEPENDENCIES += libnss
 else
+# polarssl support needs 1.3.x
 LIBCURL_CONF_OPT += --without-ssl --without-gnutls \
 	--without-polarssl --without-nss
 endif

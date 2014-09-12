@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-RTMPDUMP_VERSION = dc76f0a8461e6c8f1277eba58eae201b2dc1d06a
+RTMPDUMP_VERSION = 79459a2b43f41ac44a2ec001139bcb7b1b8f7497
 RTMPDUMP_SITE = git://git.ffmpeg.org/rtmpdump
 RTMPDUMP_INSTALL_STAGING = YES
 # Note that rtmpdump is GPLv2 but librtmp has its own license and since we only
@@ -31,6 +31,8 @@ RTMPDUMP_CFLAGS = $(TARGET_CFLAGS)
 
 ifneq ($(BR2_PREFER_STATIC_LIB),y)
     RTMPDUMP_CFLAGS += -fPIC
+else
+    RTMPDUMP_SHARED = "SHARED="
 endif
 
 define RTMPDUMP_BUILD_CMDS
@@ -39,15 +41,16 @@ define RTMPDUMP_BUILD_CMDS
 		XCFLAGS="$(RTMPDUMP_CFLAGS)" \
 		XLDFLAGS="$(TARGET_CFLAGS)" \
 		CROSS_COMPILE="$(TARGET_CROSS)" \
+		$(RTMPDUMP_SHARED) \
 		-C $(@D)/librtmp
 endef
 
 define RTMPDUMP_INSTALL_STAGING_CMDS
-	$(MAKE) prefix=/usr -C $(@D)/librtmp install DESTDIR=$(STAGING_DIR)
+	$(MAKE) prefix=/usr -C $(@D)/librtmp install DESTDIR=$(STAGING_DIR) $(RTMPDUMP_SHARED)
 endef
 
 define RTMPDUMP_INSTALL_TARGET_CMDS
-	$(MAKE) prefix=/usr -C $(@D)/librtmp install DESTDIR=$(TARGET_DIR)
+	$(MAKE) prefix=/usr -C $(@D)/librtmp install DESTDIR=$(TARGET_DIR) $(RTMPDUMP_SHARED)
 endef
 
 $(eval $(generic-package))

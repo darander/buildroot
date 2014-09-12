@@ -23,7 +23,7 @@ QT5CONNECTIVITY_DEPENDENCIES += qt5declarative
 endif
 
 define QT5CONNECTIVITY_CONFIGURE_CMDS
-	(cd $(@D); $(HOST_DIR)/usr/bin/qmake)
+	(cd $(@D); $(TARGET_MAKE_ENV) $(HOST_DIR)/usr/bin/qmake)
 endef
 
 define QT5CONNECTIVITY_BUILD_CMDS
@@ -35,7 +35,7 @@ define QT5CONNECTIVITY_INSTALL_STAGING_CMDS
 	$(QT5_LA_PRL_FILES_FIXUP)
 endef
 
-ifeq ($(BR2_PACKAGE_QT5DECLARATIVE),y)
+ifeq ($(BR2_PACKAGE_QT5DECLARATIVE_QUICK),y)
 define QT5CONNECTIVITY_INSTALL_TARGET_QMLS
 	cp -dpfr $(STAGING_DIR)/usr/qml/QtBluetooth $(TARGET_DIR)/usr/qml/
 endef
