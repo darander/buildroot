@@ -4,15 +4,16 @@ config BR2_PACKAGE_PYTHON3
 	depends on BR2_USE_WCHAR
 	# uses fork()
 	depends on BR2_USE_MMU
+	depends on BR2_TOOLCHAIN_HAS_THREADS # libffi
 	select BR2_PACKAGE_LIBFFI
 	help
 	  The python language interpreter.
 
 	  http://www.python.org/
 
-comment "python3 needs a toolchain w/ wchar"
+comment "python3 needs a toolchain w/ wchar, threads"
 	depends on BR2_USE_MMU
-	depends on !BR2_USE_WCHAR
+	depends on !BR2_USE_WCHAR || !BR2_TOOLCHAIN_HAS_THREADS
 
 if BR2_PACKAGE_PYTHON3
 
@@ -59,6 +60,11 @@ config BR2_PACKAGE_PYTHON3_DECIMAL
 	bool "decimal module"
 	help
 	  decimal module for Python3.
+
+config BR2_PACKAGE_PYTHON3_OSSAUDIODEV
+	bool "ossaudiodev module"
+	help
+	  ossaudiodev module for Python3.
 
 config BR2_PACKAGE_PYTHON3_PYEXPAT
 	select BR2_PACKAGE_EXPAT

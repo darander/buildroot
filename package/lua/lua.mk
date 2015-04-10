@@ -4,28 +4,37 @@
 #
 ################################################################################
 
+ifeq ($(BR2_PACKAGE_LUA_5_3),y)
+LUA_VERSION = 5.3.0
+else
 ifeq ($(BR2_PACKAGE_LUA_5_2),y)
 LUA_VERSION = 5.2.3
 else
 LUA_VERSION = 5.1.5
 endif
+endif
 LUA_SITE = http://www.lua.org/ftp
 LUA_INSTALL_STAGING = YES
 LUA_LICENSE = MIT
+ifeq ($(BR2_PACKAGE_LUA_5_1),y)
 LUA_LICENSE_FILES = COPYRIGHT
+else
+LUA_LICENSE_FILES = doc/readme.html
+endif
 
 LUA_PROVIDES = luainterpreter
 
 LUA_CFLAGS = -Wall -fPIC -DLUA_USE_POSIX
 
 ifeq ($(BR2_PACKAGE_LUA_5_2),y)
-LUA_CFLAGS += -DLUA_COMPAT_ALL
-ifneq ($(BR2_LARGEFILE),y)
-LUA_CFLAGS += -D_FILE_OFFSET_BITS=32
-endif
+	LUA_CFLAGS += -DLUA_COMPAT_ALL
 endif
 
-ifeq ($(BR2_PREFER_STATIC_LIB),y)
+ifeq ($(BR2_PACKAGE_LUA_5_3),y)
+	LUA_CFLAGS += -DLUA_COMPAT_5_2
+endif
+
+ifeq ($(BR2_STATIC_LIBS),y)
 	LUA_BUILDMODE = static
 else
 	LUA_BUILDMODE = dynamic
@@ -45,15 +54,23 @@ ifeq ($(BR2_PACKAGE_LUA_LINENOISE),y)
 endif
 endif
 
+ifneq ($(BR2_LARGEFILE),y)
+	LUA_CFLAGS += -D_FILE_OFFSET_BITS=32
+endif
+
+ifeq ($(BR2_PACKAGE_LUA_32BITS),y)
+define LUA_32BITS_LUACONF
+	$(SED) 's/\/\* #define LUA_32BITS \*\//#define LUA_32BITS/' $(@D)/src/luaconf.h
+endef
+
+LUA_POST_PATCH_HOOKS += LUA_32BITS_LUACONF
+endif
+
 # We never want to have host-readline and host-ncurses as dependencies
 # of host-lua.
 HOST_LUA_DEPENDENCIES =
 HOST_LUA_CFLAGS = -Wall -fPIC -DLUA_USE_DLOPEN -DLUA_USE_POSIX
 HOST_LUA_MYLIBS = -ldl
-
-ifeq ($(BR2_PACKAGE_LUA_5_2),y)
-HOST_LUA_CFLAGS += -DLUA_COMPAT_ALL
-endif
 
 define LUA_BUILD_CMDS
 	$(MAKE) \

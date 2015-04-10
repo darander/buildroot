@@ -4,9 +4,9 @@
 #
 ################################################################################
 
-UEMACS_VERSION = 4.0.15-lt
-UEMACS_SOURCE = em-$(UEMACS_VERSION).tar.gz
-UEMACS_SITE = $(BR2_KERNEL_MIRROR)/software/editors/uemacs
+UEMACS_VERSION = 8841922689769960fa074fbb053cb8507f2f3ed9
+UEMACS_SITE = $(BR2_KERNEL_MIRROR)/scm/editors/uemacs/uemacs.git
+UEMACS_SITE_METHOD = git
 UEMACS_DEPENDENCIES = ncurses
 
 define UEMACS_BUILD_CMDS

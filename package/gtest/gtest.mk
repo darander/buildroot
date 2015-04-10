@@ -19,14 +19,15 @@ GTEST_LICENSE_FILES = LICENSE
 #
 # For further details, refer to the explaination given in the README file from
 # the gtest sources.
-GTEST_CONF_OPT = -DBUILD_SHARED_LIBS=OFF
+GTEST_CONF_OPTS = -DBUILD_SHARED_LIBS=OFF
 
 define GTEST_EXTRACT_CMDS
-	unzip $(DL_DIR)/$(GTEST_SOURCE) -d $(BUILD_DIR)
+	$(UNZIP) $(DL_DIR)/$(GTEST_SOURCE) -d $(BUILD_DIR)
 endef
 
 define GTEST_INSTALL_STAGING_CMDS
 	$(INSTALL) -D -m 0755 $(@D)/libgtest.a $(STAGING_DIR)/usr/lib/libgtest.a
+	$(INSTALL) -D -m 0755 $(@D)/libgtest_main.a $(STAGING_DIR)/usr/lib/libgtest_main.a
 	$(INSTALL) -d -m 0755 $(STAGING_DIR)/usr/include/gtest/
 	cp -rp $(@D)/include/gtest/* $(STAGING_DIR)/usr/include/gtest/
 endef

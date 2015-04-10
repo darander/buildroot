@@ -6,8 +6,8 @@
 
 GRUB_VERSION = 0.97
 GRUB_SOURCE = grub_$(GRUB_VERSION).orig.tar.gz
-GRUB_PATCH  = grub_$(GRUB_VERSION)-67.diff.gz
-GRUB_SITE   = http://snapshot.debian.org/archive/debian/20130129T225227Z/pool/main/g/grub
+GRUB_PATCH = grub_$(GRUB_VERSION)-68.diff.gz
+GRUB_SITE = http://snapshot.debian.org/archive/debian/20141023T043132Z/pool/main/g/grub
 
 GRUB_LICENSE = GPLv2+
 GRUB_LICENSE_FILES = COPYING
@@ -75,13 +75,13 @@ GRUB_CONF_ENV = \
 	$(HOST_CONFIGURE_OPTS) \
 	CFLAGS="$(HOST_CFLAGS) $(GRUB_CFLAGS) -m32"
 
-GRUB_CONF_OPT = \
+GRUB_CONF_OPTS = \
 	--disable-auto-linux-mem-opt \
 	$(GRUB_CONFIG-y)
 
 ifeq ($(BR2_TARGET_GRUB_SPLASH),y)
 define GRUB_INSTALL_SPLASH
-	cp boot/grub/splash.xpm.gz $(TARGET_DIR)/boot/grub/
+	$(INSTALL) -D -m 0644 boot/grub/splash.xpm.gz $(TARGET_DIR)/boot/grub/splash.xpm.gz
 endef
 else
 define GRUB_INSTALL_SPLASH
@@ -95,14 +95,14 @@ endif
 # of a disk or disk image.
 
 define GRUB_INSTALL_TARGET_CMDS
-	install -m 0755 -D $(@D)/grub/grub $(HOST_DIR)/sbin/grub
-	mkdir -p $(TARGET_DIR)/boot/grub
-	cp $(@D)/stage1/stage1 $(TARGET_DIR)/boot/grub
+	$(INSTALL) -D -m 0755 $(@D)/grub/grub $(HOST_DIR)/sbin/grub
+	$(INSTALL) -D -m 0755 $(@D)/stage1/stage1 $(TARGET_DIR)/boot/grub/stage1
 	for f in $(GRUB_STAGE_1_5_TO_INSTALL) ; do \
-		cp $(@D)/stage2/$${f}_stage1_5 $(TARGET_DIR)/boot/grub ; \
+		$(INSTALL) -D -m 0755 $(@D)/stage2/$${f}_stage1_5 \
+			$(TARGET_DIR)/boot/grub/$${f}_stage1_5 ; \
 	done
-	cp $(@D)/stage2/stage2 $(TARGET_DIR)/boot/grub
-	cp boot/grub/menu.lst $(TARGET_DIR)/boot/grub
+	$(INSTALL) -D -m 0644 $(@D)/stage2/stage2 $(TARGET_DIR)/boot/grub/stage2
+	$(INSTALL) -D -m 0644 boot/grub/menu.lst $(TARGET_DIR)/boot/grub/menu.lst
 	$(GRUB_INSTALL_SPLASH)
 endef
 

@@ -99,7 +99,348 @@ comment "----------------------------------------------------"
 endif
 
 ###############################################################################
+
+comment "Legacy options removed in 2015.02"
+
+config BR2_PACKAGE_LIBGC
+	bool "libgc package removed"
+	select BR2_LEGACY
+	select BR2_PACKAGE_BDWGC
+	help
+	  libgc has been removed because we have the same package under a
+	  different name, bdwgc.
+
+config BR2_PACKAGE_WDCTL
+	bool "util-linux' wdctl option has been renamed"
+	select BR2_LEGACY
+	select BR2_PACKAGE_UTIL_LINUX_WDCTL
+	help
+	  util-linux' wdctl option has been renamed to BR2_PACKAGE_UTIL_LINUX_WDCTL
+	  to be aligned with how the other options are named.
+
+config BR2_PACKAGE_RPM_BZIP2_PAYLOADS
+	bool "rpm's bzip2 payloads option has been removed"
+	select BR2_LEGACY
+	select BR2_PACKAGE_BZIP2
+	help
+	  The bzip2 payloads option rely entirely on the dependant package bzip2.
+	  So, you need to select it to enable this feature.
+
+config BR2_PACKAGE_RPM_XZ_PAYLOADS
+	bool "rpm's xz payloads option has been removed"
+	select BR2_LEGACY
+	select BR2_PACKAGE_XZ
+	help
+	  The xz payloads option rely entirely on the dependant package xz.
+	  So, you need to select it to enable this feature.
+
+config BR2_PACKAGE_M4
+	bool "m4 target package removed"
+	select BR2_LEGACY
+	help
+	  The m4 target package has been removed, it's been
+	  deprecated for some time now.
+
+config BR2_PACKAGE_FLEX_BINARY
+	bool "flex binary in target option removed"
+	select BR2_LEGACY
+	help
+	  The flex binary in the target option has been removed.
+	  It's been deprecated for some time now and is essentially a
+	  development tool which isn't very useful in the target.
+
+config BR2_PACKAGE_BISON
+	bool "bison target package removed"
+	select BR2_LEGACY
+	help
+	  The bison target package has been removed, it's been
+	  deprecated for some time now and is essentially a development
+	  tool which isn't very useful in the target.
+
+config BR2_PACKAGE_GOB2
+	bool "gob2 target package removed"
+	select BR2_LEGACY
+	help
+	  The gob2 target package has been removed, it's been
+	  deprecated for some time now and was essentially useless
+	  without a target toolchain.
+
+config BR2_PACKAGE_DISTCC
+	bool "distcc target package removed"
+	select BR2_LEGACY
+	help
+	  The distcc target package has been removed, it's been
+	  deprecated for some time now and was essentially useless
+	  without a target toolchain.
+
+config BR2_PACKAGE_HASERL_VERSION_0_8_X
+	bool "haserl 0.8.x version removed"
+	select BR2_LEGACY
+	help
+	  The 0.8.x version option for haserl has been removed since it
+	  has been deprecated for some time now.
+	  You should be able to use the 0.9.x version without issues.
+
+config BR2_PACKAGE_STRONGSWAN_TOOLS
+	bool "strongswan option has been removed"
+	select BR2_LEGACY
+	select BR2_PACKAGE_STRONGSWAN_PKI
+	select BR2_PACKAGE_STRONGSWAN_SCEP
+	help
+	  The tools option has been removed upstream and the different tools
+	  have been split between the pki and scep options, with others
+	  deprecated.
+
+config BR2_PACKAGE_XBMC_ADDON_XVDR
+	bool "xbmc options have been renamed"
+	select BR2_LEGACY
+	select BR2_PACKAGE_KODI_ADDON_XVDR
+	help
+	  The XBMC media center project was renamed to Kodi entertainment center
+
+config BR2_PACKAGE_XBMC_PVR_ADDONS
+	bool "xbmc options have been renamed"
+	select BR2_LEGACY
+	select BR2_PACKAGE_KODI_PVR_ADDONS
+	help
+	  The XBMC media center project was renamed to Kodi entertainment center
+
+config BR2_PACKAGE_XBMC
+	bool "xbmc options have been renamed"
+	select BR2_LEGACY
+	select BR2_PACKAGE_KODI
+	help
+	  The XBMC media center project was renamed to Kodi entertainment center
+
+config BR2_PACKAGE_XBMC_ALSA_LIB
+	bool "xbmc options have been renamed"
+	select BR2_LEGACY
+	select BR2_PACKAGE_KODI_ALSA_LIB
+	help
+	  The XBMC media center project was renamed to Kodi entertainment center
+
+config BR2_PACKAGE_XBMC_AVAHI
+	bool "xbmc options have been renamed"
+	select BR2_LEGACY
+	select BR2_PACKAGE_KODI_AVAHI
+	help
+	  The XBMC media center project was renamed to Kodi entertainment center
+
+config BR2_PACKAGE_XBMC_DBUS
+	bool "xbmc options have been renamed"
+	select BR2_LEGACY
+	select BR2_PACKAGE_KODI_DBUS
+	help
+	  The XBMC media center project was renamed to Kodi entertainment center
+
+config BR2_PACKAGE_XBMC_LIBBLURAY
+	bool "xbmc options have been renamed"
+	select BR2_LEGACY
+	select BR2_PACKAGE_KODI_LIBBLURAY
+	help
+	  The XBMC media center project was renamed to Kodi entertainment center
+
+config BR2_PACKAGE_XBMC_GOOM
+	bool "xbmc options have been renamed"
+	select BR2_LEGACY
+	select BR2_PACKAGE_KODI_GOOM
+	help
+	  The XBMC media center project was renamed to Kodi entertainment center
+
+config BR2_PACKAGE_XBMC_RSXS
+	bool "xbmc options have been renamed"
+	select BR2_LEGACY
+	select BR2_PACKAGE_KODI_RSXS
+	help
+	  The XBMC media center project was renamed to Kodi entertainment center
+
+config BR2_PACKAGE_XBMC_LIBCEC
+	bool "xbmc options have been renamed"
+	select BR2_LEGACY
+	select BR2_PACKAGE_KODI_LIBCEC
+	help
+	  The XBMC media center project was renamed to Kodi entertainment center
+
+config BR2_PACKAGE_XBMC_LIBMICROHTTPD
+	bool "xbmc options have been renamed"
+	select BR2_LEGACY
+	select BR2_PACKAGE_KODI_LIBMICROHTTPD
+	help
+	  The XBMC media center project was renamed to Kodi entertainment center
+
+config BR2_PACKAGE_XBMC_LIBNFS
+	bool "xbmc options have been renamed"
+	select BR2_LEGACY
+	select BR2_PACKAGE_KODI_LIBNFS
+	help
+	  The XBMC media center project was renamed to Kodi entertainment center
+
+config BR2_PACKAGE_XBMC_RTMPDUMP
+	bool "xbmc options have been renamed"
+	select BR2_LEGACY
+	select BR2_PACKAGE_KODI_RTMPDUMP
+	help
+	  The XBMC media center project was renamed to Kodi entertainment center
+
+config BR2_PACKAGE_XBMC_LIBSHAIRPLAY
+	bool "xbmc options have been renamed"
+	select BR2_LEGACY
+	select BR2_PACKAGE_KODI_LIBSHAIRPLAY
+	help
+	  The XBMC media center project was renamed to Kodi entertainment center
+
+config BR2_PACKAGE_XBMC_LIBSMBCLIENT
+	bool "xbmc options have been renamed"
+	select BR2_LEGACY
+	select BR2_PACKAGE_KODI_LIBSMBCLIENT
+	help
+	  The XBMC media center project was renamed to Kodi entertainment center
+
+config BR2_PACKAGE_XBMC_LIBTHEORA
+	bool "xbmc options have been renamed"
+	select BR2_LEGACY
+	select BR2_PACKAGE_KODI_LIBTHEORA
+	help
+	  The XBMC media center project was renamed to Kodi entertainment center
+
+config BR2_PACKAGE_XBMC_LIBUSB
+	bool "xbmc options have been renamed"
+	select BR2_LEGACY
+	select BR2_PACKAGE_KODI_LIBUSB
+	help
+	  The XBMC media center project was renamed to Kodi entertainment center
+
+config BR2_PACKAGE_XBMC_LIBVA
+	bool "xbmc options have been renamed"
+	select BR2_LEGACY
+	select BR2_PACKAGE_KODI_LIBVA
+	help
+	  The XBMC media center project was renamed to Kodi entertainment center
+
+config BR2_PACKAGE_XBMC_WAVPACK
+	bool "xbmc options have been renamed"
+	select BR2_LEGACY
+	select BR2_PACKAGE_KODI_WAVPACK
+	help
+	  The XBMC media center project was renamed to Kodi entertainment center
+
+config BR2_PREFER_STATIC_LIB
+	bool "static library option renamed"
+	select BR2_LEGACY
+	help
+	  The BR2_PREFER_STATIC_LIB was renamed to BR2_STATIC_LIBS. It
+	  highlights the fact that the option no longer "prefers"
+	  static libraries, but "enforces" static libraries (i.e
+	  shared libraries are completely unused).
+
+	  Take care of updating the type of libraries you want under the
+	  "Build options" menu.
+
+###############################################################################
+comment "Legacy options removed in 2014.11"
+
+config BR2_x86_generic
+	bool "x86 generic variant has been removed"
+	select BR2_LEGACY
+	help
+	  The generic x86 CPU variant has been removed. Use another
+	  CPU variant instead.
+
+config BR2_GCC_VERSION_4_4_X
+	bool "gcc 4.4.x has been removed"
+	select BR2_LEGACY
+	help
+	  The 4.4.x version of gcc has been removed. Use a newer
+	  version instead.
+
+config BR2_sparc_sparchfleon
+	bool "sparchfleon CPU has been removed"
+	select BR2_LEGACY
+	help
+	  The sparchfleon CPU was only supported in a patched gcc 4.4
+	  version. Its support has been removed in favor of the leon3
+	  CPU starting from gcc 4.8.x.
+
+config BR2_sparc_sparchfleonv8
+	bool "sparchfleonv8 CPU has been removed"
+	select BR2_LEGACY
+	help
+	  The sparchfleonv8 CPU was only supported in a patched gcc
+	  4.4 version. Its support has been removed in favor of the
+	  leon3 CPU starting from gcc 4.8.x.
+
+config BR2_sparc_sparcsfleon
+	bool "sparcsfleon CPU has been removed"
+	select BR2_LEGACY
+	help
+	  The sparcsfleon CPU was only supported in a patched gcc 4.4
+	  version. Its support has been removed in favor of the leon3
+	  CPU starting from gcc 4.8.x.
+
+config BR2_sparc_sparcsfleonv8
+	bool "sparcsfleonv8 CPU has been removed"
+	select BR2_LEGACY
+	help
+	  The sparcsfleonv8 CPU was only supported in a patched gcc
+	  4.4 version. Its support has been removed in favor of the
+	  leon3 CPU starting from gcc 4.8.x.
+
+config BR2_PACKAGE_XLIB_LIBPCIACCESS
+	bool "xlib-libpciaccess option has been renamed"
+	depends on BR2_PACKAGE_XORG7
+	select BR2_LEGACY
+	select BR2_PACKAGE_LIBPCIACCESS
+	help
+	  libpciaccess neither depends on X11 nor Xlib. Thus the
+	  package has been renamed BR2_PACKAGE_LIBPCIACCESS
+
+config BR2_PACKAGE_LINUX_FIRMWARE_XC5000
+	bool "Xceive xc5000 option has been renamed"
+	select BR2_PACKAGE_LINUX_FIRMWARE_XCx000
+	help
+	  The Xceive xc5000 option now also handles older firmwares from
+	  Xceive (the xc4000 series), as well as new firmwares (the xc5000c)
+	  from Cresta, who bought Xceive.
+
+config BR2_PACKAGE_LINUX_FIRMWARE_CXGB4
+	bool "Chelsio T4 option has been renamed"
+	select BR2_PACKAGE_LINUX_FIRMWARE_CXGB4_T4
+	help
+	  The Chelsio T4 option BR2_PACKAGE_LINUX_FIRMWARE_CXGB4
+	  has been renamed to BR2_PACKAGE_LINUX_FIRMWARE_CXGB4_T4
+	  to better account for the fact that a T5 variant exists.
+
+config BR2_PACKAGE_LINUX_FIRMWARE_IWLWIFI_3160_7260_7
+	bool "BR2_PACKAGE_LINUX_FIRMWARE_IWLWIFI_3160_7260_7 has been renamed"
+	help
+	  The option BR2_PACKAGE_LINUX_FIRMWARE_IWLWIFI_3160_7260_7 was
+	  renamed to BR2_PACKAGE_LINUX_FIRMWARE_IWLWIFI_REV_7. You must
+	  select it in:
+	      Target packages -> Hardware handling ->
+	      Firmware -> linux-firmware -> WiFi firmware ->
+	      iwlwifi 3160/726x revision to use (revision 7)
+
+config BR2_PACKAGE_LINUX_FIRMWARE_IWLWIFI_3160_7260_8
+	bool "BR2_PACKAGE_LINUX_FIRMWARE_IWLWIFI_3160_7260_8 has been renamed"
+	help
+	  The option BR2_PACKAGE_LINUX_FIRMWARE_IWLWIFI_3160_7260_8 was
+	  renamed to BR2_PACKAGE_LINUX_FIRMWARE_IWLWIFI_REV_8. You must
+	  select it in:
+	      Target packages -> Hardware handling ->
+	      Firmware -> linux-firmware -> WiFi firmware ->
+	      iwlwifi 3160/726x revision to use (revision 8)
+
+###############################################################################
 comment "Legacy options removed in 2014.08"
+
+config BR2_PACKAGE_LIBELF
+	bool "libelf has been removed"
+	select BR2_PACKAGE_ELFUTILS
+	select BR2_LEGACY
+	help
+	  The libelf package provided an old version of the libelf library
+	  and is deprecated. The libelf library is now provided by the
+	  elfutils package.
 
 config BR2_KERNEL_HEADERS_3_8
 	bool "kernel headers version 3.8.x are no longer supported"

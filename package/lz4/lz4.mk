@@ -4,13 +4,13 @@
 #
 ################################################################################
 
-LZ4_VERSION = r119
+LZ4_VERSION = r123
 LZ4_SITE = $(call github,Cyan4973,lz4,$(LZ4_VERSION))
 LZ4_INSTALL_STAGING = YES
 LZ4_LICENSE = BSD-2c
 LZ4_LICENSE_FILES = LICENSE
 
-ifeq ($(BR2_PREFER_STATIC_LIB),y)
+ifeq ($(BR2_STATIC_LIBS),y)
 define LZ4_DISABLE_SHARED
 	$(SED) '/SHARED/d' $(@D)/Makefile
 endef

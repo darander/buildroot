@@ -15,11 +15,13 @@
  * kind, whether express or implied.
  */
 
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <string.h>
 #include <limits.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <errno.h>
 
 static char path[PATH_MAX];
 static char sysroot[PATH_MAX];
@@ -33,10 +35,9 @@ static char sysroot[PATH_MAX];
  * Currently, we have:
  * 	-mfloat-abi=
  * 	-march=
- * 	-mtune=
  * 	-mcpu=
  */
-#define EXCLUSIVE_ARGS	4
+#define EXCLUSIVE_ARGS	3
 
 static char *predef_args[] = {
 	path,
@@ -70,6 +71,25 @@ static char *predef_args[] = {
 #endif
 };
 
+static void check_unsafe_path(const char *path, int paranoid)
+{
+	char **c;
+	static char *unsafe_paths[] = {
+		"/lib", "/usr/include", "/usr/lib", "/usr/local/include", "/usr/local/lib", NULL,
+	};
+
+	for (c = unsafe_paths; *c != NULL; c++) {
+		if (!strncmp(path, *c, strlen(*c))) {
+			fprintf(stderr, "%s: %s: unsafe header/library path used in cross-compilation: '%s'\n",
+				program_invocation_short_name,
+				paranoid ? "ERROR" : "WARNING", path);
+			if (paranoid)
+				exit(1);
+			continue;
+		}
+	}
+}
+
 int main(int argc, char **argv)
 {
 	char **args, **cur;
@@ -77,6 +97,8 @@ int main(int argc, char **argv)
 	char *progpath = argv[0];
 	char *basename;
 	char *env_debug;
+	char *paranoid_wrapper;
+	int paranoid;
 	int ret, i, count = 0, debug;
 
 	/* Calculate the relative paths */
@@ -154,14 +176,12 @@ int main(int argc, char **argv)
 #endif
 
 #if defined(BR_ARCH) || \
-    defined(BR_TUNE) || \
     defined(BR_CPU)
-	/* Add our -march/cpu/tune/abi flags, but only if none are
+	/* Add our -march/cpu/abi flags, but only if none are
 	 * already specified on the commandline
 	 */
 	for (i = 1; i < argc; i++) {
 		if (!strncmp(argv[i], "-march=", strlen("-march=")) ||
-		    !strncmp(argv[i], "-mtune=", strlen("-mtune=")) ||
 		    !strncmp(argv[i], "-mcpu=",  strlen("-mcpu=" )))
 			break;
 	}
@@ -169,14 +189,40 @@ int main(int argc, char **argv)
 #ifdef BR_ARCH
 		*cur++ = "-march=" BR_ARCH;
 #endif
-#ifdef BR_TUNE
-		*cur++ = "-mtune=" BR_TUNE;
-#endif
 #ifdef BR_CPU
 		*cur++ = "-mcpu=" BR_CPU;
 #endif
 	}
-#endif /* ARCH || TUNE || CPU */
+#endif /* ARCH || CPU */
+
+	paranoid_wrapper = getenv("BR_COMPILER_PARANOID_UNSAFE_PATH");
+	if (paranoid_wrapper && strlen(paranoid_wrapper) > 0)
+		paranoid = 1;
+	else
+		paranoid = 0;
+
+	/* Check for unsafe library and header paths */
+	for (i = 1; i < argc; i++) {
+
+		/* Skip options that do not start with -I and -L */
+		if (strncmp(argv[i], "-I", 2) && strncmp(argv[i], "-L", 2))
+			continue;
+
+		/* We handle two cases: first the case where -I/-L and
+		 * the path are separated by one space and therefore
+		 * visible as two separate options, and then the case
+		 * where they are stuck together forming one single
+		 * option.
+		 */
+		if (argv[i][2] == '\0') {
+			i++;
+			if (i == argc)
+				continue;
+			check_unsafe_path(argv[i], paranoid);
+		} else {
+			check_unsafe_path(argv[i] + 2, paranoid);
+		}
+	}
 
 	/* append forward args */
 	memcpy(cur, &argv[1], sizeof(char *) * (argc - 1));

@@ -4,9 +4,12 @@
 #
 ################################################################################
 
-TAR_VERSION = 1.27.1
+TAR_VERSION = 1.28
 TAR_SOURCE = tar-$(TAR_VERSION).tar.xz
 TAR_SITE = $(BR2_GNU_MIRROR)/tar
+# busybox installs in /bin, so we need tar to install as well in /bin
+# so that it overrides the Busybox symlinks.
+TAR_CONF_OPTS = --exec-prefix=/
 TAR_LICENSE = GPLv3+
 TAR_LICENSE_FILES = COPYING
 
@@ -14,6 +17,20 @@ TAR_LICENSE_FILES = COPYING
 ifeq ($(BR2_PACKAGE_BUSYBOX),y)
 TAR_DEPENDENCIES += busybox
 HOST_TAR_DEPENDENCIES =
+endif
+
+ifeq ($(BR2_PACKAGE_ACL),y)
+TAR_DEPENDENCIES += acl
+TAR_CONF_OPTS += --with-posix-acls
+else
+TAR_CONF_OPTS += --without-posix-acls
+endif
+
+ifeq ($(BR2_PACKAGE_ATTR),y)
+TAR_DEPENDENCIES += attr
+TAR_CONF_OPTS += --with-xattrs
+else
+TAR_CONF_OPTS += --without-xattrs
 endif
 
 $(eval $(autotools-package))

@@ -5,18 +5,19 @@
 ################################################################################
 
 PYTHON_VERSION_MAJOR = 2.7
-PYTHON_VERSION       = $(PYTHON_VERSION_MAJOR).8
-PYTHON_SOURCE        = Python-$(PYTHON_VERSION).tar.xz
-PYTHON_SITE          = http://python.org/ftp/python/$(PYTHON_VERSION)
-PYTHON_LICENSE       = Python software foundation license v2, others
+PYTHON_VERSION = $(PYTHON_VERSION_MAJOR).9
+PYTHON_SOURCE = Python-$(PYTHON_VERSION).tar.xz
+PYTHON_SITE = http://python.org/ftp/python/$(PYTHON_VERSION)
+PYTHON_LICENSE = Python software foundation license v2, others
 PYTHON_LICENSE_FILES = LICENSE
+PYTHON_LIBTOOL_PATCH = NO
 
 # Python needs itself to be built, so in order to cross-compile
 # Python, we need to build a host Python first. This host Python is
 # also installed in $(HOST_DIR), as it is needed when cross-compiling
 # third-party Python modules.
 
-HOST_PYTHON_CONF_OPT += 	\
+HOST_PYTHON_CONF_OPTS += 	\
 	--enable-static		\
 	--without-cxx-main 	\
 	--disable-sqlite3	\
@@ -32,6 +33,7 @@ HOST_PYTHON_CONF_OPT += 	\
 	--disable-test-modules	\
 	--disable-bz2		\
 	--disable-ssl		\
+	--disable-ossaudiodev	\
 	--disable-pyo-build
 
 # Make sure that LD_LIBRARY_PATH overrides -rpath.
@@ -48,7 +50,7 @@ HOST_PYTHON_CONF_ENV += \
 # MAKE1 has shown to workaround the problem.
 HOST_PYTHON_MAKE = $(MAKE1)
 
-PYTHON_DEPENDENCIES  = host-python libffi
+PYTHON_DEPENDENCIES = host-python libffi
 
 HOST_PYTHON_DEPENDENCIES = host-expat host-zlib
 
@@ -61,61 +63,67 @@ endif
 ifeq ($(BR2_PACKAGE_PYTHON_CURSES),y)
 PYTHON_DEPENDENCIES += ncurses
 else
-PYTHON_CONF_OPT += --disable-curses
+PYTHON_CONF_OPTS += --disable-curses
 endif
 
 ifeq ($(BR2_PACKAGE_PYTHON_PYEXPAT),y)
 PYTHON_DEPENDENCIES += expat
-PYTHON_CONF_OPT += --with-expat=system
+PYTHON_CONF_OPTS += --with-expat=system
 else
-PYTHON_CONF_OPT += --with-expat=none
+PYTHON_CONF_OPTS += --with-expat=none
 endif
 
 ifeq ($(BR2_PACKAGE_PYTHON_BSDDB),y)
 PYTHON_DEPENDENCIES += berkeleydb
 else
-PYTHON_CONF_OPT += --disable-bsddb
+PYTHON_CONF_OPTS += --disable-bsddb
 endif
 
 ifeq ($(BR2_PACKAGE_PYTHON_SQLITE),y)
 PYTHON_DEPENDENCIES += sqlite
 else
-PYTHON_CONF_OPT += --disable-sqlite3
+PYTHON_CONF_OPTS += --disable-sqlite3
 endif
 
 ifeq ($(BR2_PACKAGE_PYTHON_SSL),y)
 PYTHON_DEPENDENCIES += openssl
 else
-PYTHON_CONF_OPT += --disable-ssl
+PYTHON_CONF_OPTS += --disable-ssl
 endif
 
 ifneq ($(BR2_PACKAGE_PYTHON_CODECSCJK),y)
-PYTHON_CONF_OPT += --disable-codecs-cjk
+PYTHON_CONF_OPTS += --disable-codecs-cjk
 endif
 
 ifneq ($(BR2_PACKAGE_PYTHON_UNICODEDATA),y)
-PYTHON_CONF_OPT += --disable-unicodedata
+PYTHON_CONF_OPTS += --disable-unicodedata
 endif
 
 # Default is UCS2 w/o a conf opt
 ifeq ($(BR2_PACKAGE_PYTHON_UCS4),y)
-PYTHON_CONF_OPT += --enable-unicode=ucs4
+PYTHON_CONF_OPTS += --enable-unicode=ucs4
 endif
 
 ifeq ($(BR2_PACKAGE_PYTHON_BZIP2),y)
 PYTHON_DEPENDENCIES += bzip2
 else
-PYTHON_CONF_OPT += --disable-bz2
+PYTHON_CONF_OPTS += --disable-bz2
 endif
 
 ifeq ($(BR2_PACKAGE_PYTHON_ZLIB),y)
 PYTHON_DEPENDENCIES += zlib
 else
-PYTHON_CONF_OPT += --disable-zlib
+PYTHON_CONF_OPTS += --disable-zlib
 endif
 
 ifeq ($(BR2_PACKAGE_PYTHON_HASHLIB),y)
 PYTHON_DEPENDENCIES += openssl
+endif
+
+ifeq ($(BR2_PACKAGE_PYTHON_OSSAUDIODEV),y)
+PYTHON_CONF_OPTS += --enable-ossaudiodev
+else
+PYTHON_CONF_OPTS += --disable-ossaudiodev
 endif
 
 PYTHON_CONF_ENV += \
@@ -124,7 +132,7 @@ PYTHON_CONF_ENV += \
 	ac_cv_file__dev_ptc=yes \
 	ac_cv_working_tzset=yes
 
-PYTHON_CONF_OPT += \
+PYTHON_CONF_OPTS += \
 	--without-cxx-main 	\
 	--without-doc-strings	\
 	--with-system-ffi	\
@@ -208,3 +216,17 @@ PYTHON_PATH = $(TARGET_DIR)/usr/lib/python$(PYTHON_VERSION_MAJOR)/sysconfigdata/
 
 $(eval $(autotools-package))
 $(eval $(host-autotools-package))
+
+ifeq ($(BR2_PACKAGE_PYTHON_PYC_ONLY),y)
+define PYTHON_FINALIZE_TARGET
+	find $(TARGET_DIR)/usr/lib/python$(PYTHON_VERSION_MAJOR) -name '*.py' -print0 | xargs -0 rm -f
+endef
+endif
+
+ifeq ($(BR2_PACKAGE_PYTHON_PY_ONLY),y)
+define PYTHON_FINALIZE_TARGET
+	find $(TARGET_DIR)/usr/lib/python$(PYTHON_VERSION_MAJOR) -name '*.pyc' -print0 | xargs -0 rm -f
+endef
+endif
+
+TARGET_FINALIZE_HOOKS += PYTHON_FINALIZE_TARGET

@@ -11,12 +11,13 @@ PERL_GD_DEPENDENCIES = perl zlib libpng freetype gd
 PERL_GD_LICENSE = Artistic-2.0 or GPLv1+
 PERL_GD_LICENSE_FILES = LICENSE
 
-PERL_GD_CONF_OPT = \
+PERL_GD_CONF_OPTS = \
 	-options=FT,PNG \
 	-lib_gd_path=$(STAGING_DIR)/usr \
 	-lib_ft_path=$(STAGING_DIR)/usr \
 	-lib_png_path=$(STAGING_DIR)/usr \
 	-lib_zlib_path=$(STAGING_DIR)/usr \
-	-ignore_missing_gd
+	-ignore_missing_gd \
+	-gdlib=$(STAGING_DIR)/usr/bin/gdlib-config
 
 $(eval $(perl-package))

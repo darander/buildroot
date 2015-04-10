@@ -30,7 +30,7 @@ GLIBC_SUBDIR = build
 
 GLIBC_INSTALL_STAGING = YES
 
-GLIBC_INSTALL_STAGING_OPT = install_root=$(STAGING_DIR) install
+GLIBC_INSTALL_STAGING_OPTS = install_root=$(STAGING_DIR) install
 
 # Thumb build is broken, build in ARM mode
 ifeq ($(BR2_ARM_INSTRUCTIONS_THUMB),y)
@@ -45,6 +45,10 @@ ifeq ($(BR2_MIPS_NABI64),y)
 GLIBC_EXTRA_CFLAGS += -mabi=64
 else ifeq ($(BR2_MIPS_OABI32),y)
 GLIBC_EXTRA_CFLAGS += -mabi=32
+endif
+
+ifeq ($(BR2_ENABLE_DEBUG),y)
+GLIBC_EXTRA_CFLAGS += -g
 endif
 
 # The stubs.h header is not installed by install-headers, but is
@@ -79,6 +83,7 @@ define GLIBC_CONFIGURE_CMDS
 		$(SHELL) $(@D)/$(GLIBC_SRC_SUBDIR)/configure \
 		ac_cv_path_BASH_SHELL=/bin/bash \
 		libc_cv_forced_unwind=yes \
+		libc_cv_ssp=no \
 		--target=$(GNU_TARGET_NAME) \
 		--host=$(GNU_TARGET_NAME) \
 		--build=$(GNU_HOST_NAME) \
@@ -91,18 +96,7 @@ define GLIBC_CONFIGURE_CMDS
 		--without-gd \
 		--enable-obsolete-rpc \
 		--with-headers=$(STAGING_DIR)/usr/include)
-	# Install headers and start files
-	$(TARGET_MAKE_ENV) $(MAKE) -C $(@D)/build \
-		install_root=$(STAGING_DIR) \
-		install-bootstrap-headers=yes \
-		install-headers
-	$(TARGET_MAKE_ENV) $(MAKE) -C $(@D)/build csu/subdir_lib
-	cp $(@D)/build/csu/crt1.o $(STAGING_DIR)/usr/lib/
-	cp $(@D)/build/csu/crti.o $(STAGING_DIR)/usr/lib/
-	cp $(@D)/build/csu/crtn.o $(STAGING_DIR)/usr/lib/
 	$(GLIBC_ADD_MISSING_STUB_H)
-	$(TARGET_CROSS)gcc -nostdlib \
-		-nostartfiles -shared -x c /dev/null -o $(STAGING_DIR)/usr/lib/libc.so
 endef
 
 
@@ -127,6 +121,3 @@ define GLIBC_INSTALL_TARGET_CMDS
 endef
 
 $(eval $(autotools-package))
-
-# Before (e)glibc is built, we must have the second stage cross-compiler
-$(GLIBC_TARGET_BUILD): | host-gcc-intermediate

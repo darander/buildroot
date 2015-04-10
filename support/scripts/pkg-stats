@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Copyright (C) 2009 by Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
 #
@@ -67,14 +67,17 @@ td.lotsofpatches {
 <td class=\"centered\">Infrastructure</td>
 <td class=\"centered\">License</td>
 <td class=\"centered\">License files</td>
+<td class=\"centered\">Hash file</td>
 </tr>
 "
 
 autotools_packages=0
 cmake_packages=0
+kconfig_packages=0
 luarocks_package=0
 perl_packages=0
 python_packages=0
+rebar_packages=0
 virtual_packages=0
 generic_packages=0
 manual_packages=0
@@ -82,6 +85,8 @@ packages_with_licence=0
 packages_without_licence=0
 packages_with_license_files=0
 packages_without_license_files=0
+packages_with_hash_file=0
+packages_without_hash_file=0
 total_patch_count=0
 cnt=0
 
@@ -89,6 +94,7 @@ for i in $(find boot/ linux/ package/ -name '*.mk' | sort) ; do
 
     if test \
 	$i = "boot/common.mk" -o \
+	$i = "linux/linux-ext-fbtft.mk" -o \
 	$i = "linux/linux-ext-xenomai.mk" -o \
 	$i = "linux/linux-ext-rtai.mk" -o \
 	$i = "package/efl/efl.mk" -o \
@@ -101,11 +107,14 @@ for i in $(find boot/ linux/ package/ -name '*.mk' | sort) ; do
 	$i = "package/opengl/opengl.mk" -o \
 	$i = "package/qt5/qt5.mk" -o \
 	$i = "package/x11r7/x11r7.mk" -o \
+	$i = "package/doc-asciidoc.mk" -o \
 	$i = "package/pkg-autotools.mk" -o \
 	$i = "package/pkg-cmake.mk" -o \
+	$i = "package/pkg-kconfig.mk" -o \
 	$i = "package/pkg-luarocks.mk" -o \
 	$i = "package/pkg-perl.mk" -o \
 	$i = "package/pkg-python.mk" -o \
+	$i = "package/pkg-rebar.mk" -o \
 	$i = "package/pkg-virtual.mk" -o \
 	$i = "package/pkg-download.mk" -o \
 	$i = "package/pkg-generic.mk" -o \
@@ -128,6 +137,11 @@ for i in $(find boot/ linux/ package/ -name '*.mk' | sort) ; do
 
     if grep -E "\(autotools-package\)" $i > /dev/null ; then
 	infratype="autotools"
+	hastarget=1
+    fi
+
+    if grep -E "\(kconfig-package\)" $i > /dev/null ; then
+	infratype="kconfig"
 	hastarget=1
     fi
 
@@ -160,6 +174,17 @@ for i in $(find boot/ linux/ package/ -name '*.mk' | sort) ; do
 	infratype="python"
 	hastarget=1
     fi
+
+    if grep -E "\(host-rebar-package\)" $i > /dev/null ; then
+	infratype="rebar"
+	hashost=1
+    fi
+
+    if grep -E "\(rebar-package\)" $i > /dev/null ; then
+	infratype="rebar"
+	hastarget=1
+    fi
+
     if grep -E "\(host-virtual-package\)" $i > /dev/null ; then
 	infratype="virtual"
 	hashost=1
@@ -191,6 +216,7 @@ for i in $(find boot/ linux/ package/ -name '*.mk' | sort) ; do
     fi
 
     pkg=$(basename $i)
+    dir=$(dirname $i)
     pkg=${pkg%.mk}
     pkgvariable=$(echo ${pkg} | tr "a-z-" "A-Z_")
 
@@ -203,12 +229,16 @@ for i in $(find boot/ linux/ package/ -name '*.mk' | sort) ; do
 	autotools_packages=$(($autotools_packages+1))
     elif [ ${infratype} = "cmake" ]; then
 	cmake_packages=$(($cmake_packages+1))
+    elif [ ${infratype} = "kconfig" ]; then
+	kconfig_packages=$(($kconfig_packages+1))
     elif [ ${infratype} = "luarocks" ]; then
 	luarocks_packages=$(($luarocks_packages+1))
     elif [ ${infratype} = "perl" ]; then
 	perl_packages=$(($perl_packages+1))
     elif [ ${infratype} = "python" ]; then
 	python_packages=$(($python_packages+1))
+    elif [ ${infratype} = "rebar" ]; then
+	rebar_packages=$(($rebar_packages+1))
     elif [ ${infratype} = "virtual" ]; then
 	virtual_packages=$(($virtual_packages+1))
     elif [ ${infratype} = "generic" ]; then
@@ -229,6 +259,14 @@ for i in $(find boot/ linux/ package/ -name '*.mk' | sort) ; do
     else
 	packages_without_license_files=$(($packages_without_license_files+1))
 	license_files=0
+    fi
+
+    if test -f ${dir}/${pkg}.hash; then
+	packages_with_hash_file=$(($packages_with_hash_file+1))
+	hash_file=1
+    else
+	packages_without_hash_file=$(($packages_without_hash_file+1))
+	hash_file=0
     fi
 
     echo "<tr>"
@@ -279,6 +317,12 @@ for i in $(find boot/ linux/ package/ -name '*.mk' | sort) ; do
 	echo "<td class=\"centered correct\">Yes</td>"
     fi
 
+    if [ ${hash_file} -eq 0 ] ; then
+	echo "<td class=\"centered wrong\">No</td>"
+    else
+	echo "<td class=\"centered correct\">Yes</td>"
+    fi
+
     echo "</tr>"
 
 done
@@ -303,12 +347,20 @@ echo "<td>Packages using the <i>luarocks</i> infrastructure</td>"
 echo "<td>$luarocks_packages</td>"
 echo "</tr>"
 echo "<tr>"
+echo "<td>Packages using the <i>kconfig</i> infrastructure</td>"
+echo "<td>$kconfig_packages</td>"
+echo "</tr>"
+echo "<tr>"
 echo "<td>Packages using the <i>perl</i> infrastructure</td>"
 echo "<td>$perl_packages</td>"
 echo "</tr>"
 echo "<tr>"
 echo "<td>Packages using the <i>python</i> infrastructure</td>"
 echo "<td>$python_packages</td>"
+echo "</tr>"
+echo "<tr>"
+echo "<td>Packages using the <i>rebar</i> infrastructure</td>"
+echo "<td>$rebar_packages</td>"
 echo "</tr>"
 echo "<tr>"
 echo "<td>Packages using the <i>virtual</i> infrastructure</td>"
@@ -333,6 +385,14 @@ echo "</tr>"
 echo "<tr>"
 echo "<td>Packages not having licence files information</td>"
 echo "<td>$packages_without_license_files</td>"
+echo "</tr>"
+echo "<tr>"
+echo "<td>Packages having hash file</td>"
+echo "<td>$packages_with_hash_file</td>"
+echo "</tr>"
+echo "<tr>"
+echo "<td>Packages not having hash file</td>"
+echo "<td>$packages_without_hash_file</td>"
 echo "</tr>"
 echo "<tr>"
 echo "<td>Number of patches in all packages</td>"

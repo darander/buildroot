@@ -6,13 +6,13 @@
 case "$1" in
 	start)
 		echo -n "Starting openntpd: "
-		start-stop-daemon -S -x /usr/sbin/ntpd
-		[ $? == 0 ] && echo "OK" || echo "FAIL"
+		start-stop-daemon -S -x /usr/sbin/ntpd -- -p /run/ntpd.pid
+		[ $? = 0 ] && echo "OK" || echo "FAIL"
 		;;
 	stop)
 		echo -n "Stopping openntpd: "
-		start-stop-daemon -K -x /usr/sbin/ntpd
-		[ $? == 0 ] && echo "OK" || echo "FAIL"
+		start-stop-daemon -K -q -p /run/ntpd.pid
+		[ $? = 0 ] && echo "OK" || echo "FAIL"
 		;;
 	restart)
 		"$0" stop

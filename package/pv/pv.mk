@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-PV_VERSION = 1.4.12
+PV_VERSION = 1.5.7
 PV_SOURCE = pv-$(PV_VERSION).tar.bz2
 PV_SITE = http://www.ivarch.com/programs/sources
 PV_LICENSE = Artistic-2.0
@@ -23,7 +23,7 @@ PV_DEPENDENCIES = $(if $(BR2_NEEDS_GETTEXT_IF_LOCALE),gettext host-gettext)
 # configuration, as the ld default emulation may not necessarily be
 # the correct one. By passing the below values for LD and LDFLAGS, we
 # ensure that 'gcc' is used to do these partial linking steps.
-PV_MAKE_OPT = \
+PV_MAKE_OPTS = \
 	LD="$(TARGET_CC)" \
 	LDFLAGS="-Wl,-r -nostdlib"
 

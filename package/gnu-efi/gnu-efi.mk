@@ -4,8 +4,8 @@
 #
 ################################################################################
 
-GNU_EFI_VERSION = 3.0u
-GNU_EFI_SOURCE = gnu-efi_$(GNU_EFI_VERSION).orig.tar.gz
+GNU_EFI_VERSION = 3.0.1
+GNU_EFI_SOURCE = gnu-efi-$(GNU_EFI_VERSION).tar.bz2
 GNU_EFI_SITE = http://downloads.sourceforge.net/project/gnu-efi
 GNU_EFI_INSTALL_STAGING = YES
 GNU_EFI_LICENSE = GPLv2+ (gnuefi), BSD (efilib)
@@ -17,9 +17,9 @@ GNU_EFI_LICENSE_FILES = debian/copyright
 GNU_EFI_INSTALL_TARGET = NO
 
 ifeq ($(BR2_i386),y)
-GNU_EFI_PLATFORM=ia32
+GNU_EFI_PLATFORM = ia32
 else ifeq ($(BR2_x86_64),y)
-GNU_EFI_PLATFORM=x86_64
+GNU_EFI_PLATFORM = x86_64
 endif
 
 define GNU_EFI_BUILD_CMDS

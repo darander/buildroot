@@ -15,7 +15,8 @@ GPM_DEPENDENCIES = host-bison
 # if not already installed in staging dir, gpm Makefile may fail to find some
 # of the headers needed to generate build dependencies, the first time it is
 # built. CPPFLAGS is used to pass the right include path to dependency rules.
-GPM_CONF_ENV = CPPFLAGS="$(TARGET_CPPFLAGS) -I$(@D)/src/headers/"
+GPM_CONF_ENV = CPPFLAGS="$(TARGET_CPPFLAGS) -I$(@D)/src/headers/" \
+			   ac_cv_path_emacs=no
 
 # For some reason, Microblaze gcc does not define __ELF__, which gpm
 # configure script uses to determine whether the architecture uses ELF
@@ -30,7 +31,7 @@ endif
 # and as it's better to have gpm support in ncurses that the contrary, we force
 # gpm to not look after ncurses explicitly.
 # http://invisible-island.net/ncurses/ncurses.faq.html#using_gpm_lib
-GPM_CONF_OPT = --without-curses
+GPM_CONF_OPTS = --without-curses
 
 # configure is missing but gpm seems not compatible with our autoreconf
 # mechanism so we have to do it manually instead of using GPM_AUTORECONF = YES
@@ -53,8 +54,8 @@ GPM_POST_PATCH_HOOKS += GPM_DISABLE_DOC_INSTALL
 ifeq ($(BR2_PACKAGE_GPM_INSTALL_TEST_TOOLS),)
 define GPM_REMOVE_TEST_TOOLS_FROM_TARGET
 	for tools in mev hltest mouse-test display-buttons \
-			get-versions display-coords; do \
-		rm -f $(TARGET_DIR)/usr/bin/$$tools ; \
+		get-versions display-coords; do \
+			rm -f $(TARGET_DIR)/usr/bin/$$tools ; \
 	done
 endef
 GPM_POST_INSTALL_TARGET_HOOKS += GPM_REMOVE_TEST_TOOLS_FROM_TARGET
