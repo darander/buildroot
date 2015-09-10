@@ -26,20 +26,13 @@ QT5BASE_CONFIGURE_OPTS += \
 	-no-iconv \
 	-system-zlib \
 	-system-pcre \
-	-no-pch
+	-no-pch \
+	-shared
 
 ifeq ($(BR2_ENABLE_DEBUG),y)
 QT5BASE_CONFIGURE_OPTS += -debug
 else
 QT5BASE_CONFIGURE_OPTS += -release
-endif
-
-ifeq ($(BR2_STATIC_LIBS),y)
-QT5BASE_CONFIGURE_OPTS += -static
-else
-# We apparently can't build both the shared and static variants of the
-# library.
-QT5BASE_CONFIGURE_OPTS += -shared
 endif
 
 QT5BASE_CONFIGURE_OPTS += -largefile
@@ -156,6 +149,7 @@ QT5BASE_CONFIGURE_OPTS += $(if $(BR2_PACKAGE_QT5BASE_EXAMPLES),-make,-nomake) ex
 
 # Build the list of libraries to be installed on the target
 QT5BASE_INSTALL_LIBS_y                                 += Qt5Core
+QT5BASE_INSTALL_LIBS_$(BR2_PACKAGE_QT5BASE_XCB)        += Qt5XcbQpa
 QT5BASE_INSTALL_LIBS_$(BR2_PACKAGE_QT5BASE_NETWORK)    += Qt5Network
 QT5BASE_INSTALL_LIBS_$(BR2_PACKAGE_QT5BASE_CONCURRENT) += Qt5Concurrent
 QT5BASE_INSTALL_LIBS_$(BR2_PACKAGE_QT5BASE_SQL)        += Qt5Sql
