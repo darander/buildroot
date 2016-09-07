@@ -1,3 +1,16 @@
-bootpart=0:1
-bootdir=
-uenvcmd=run loadimage;run loadramdisk;run findfdt;run loadfdt;run ramboot
+bootdelay=5
+
+serverip=192.168.90.1
+rootpath=/exports/rootfs
+bootfile=zImage
+
+ipaddr=192.168.90.2
+netmask=255.255.255.0
+
+setnfsopts=setenv nfsopts vers=3,${nfsopts}
+
+staticnetargs=setenv bootargs console=${console} ${optargs} root=/dev/nfs nfsroot=${serverip}:${rootpath},${nfsopts} rw ip=${ipaddr}:${serverip}::${netmask}::eth0::
+
+staticnetboot=echo Booting from network ...; setenv autoload no; tftp ${loadaddr} ${bootfile}; tftp ${fdtaddr} ${fdtfile}; run staticnetargs; bootz ${loadaddr} - ${fdtaddr}
+
+uenvcmd=run setnfsopts; run staticnetboot
